@@ -4,93 +4,14 @@ from mingus.midi import fluidsynth
 from mingus.containers.note import Note 
 
 # Keybinds for 7 octaves
-order = [
-		"`",
-		"~",
-		"1",
-		"!",
-		"2",
-		"3",
-		"#",
-		"4",
-		"$",
-		"5",
-		"%",
-		"6",	
-		"7",
-		"&",
-		"8",
-		"*",
-		"9",
-		"0",
-		")",
-		"-",
-		"_",
-		"=",
-		"+",
-		"backspace",	
-		"q",
-		"Q",
-		"w",
-		"W",
-		"e",
-		"r",
-		"R",
-		"t",
-		"T",
-		"y",
-		"Y",
-		"u",
-		"i",
-		"I",
-		"o",
-		"O",
-		"p",
-		"[",
-		"{",
-		"]",
-		"}",
-		"\\",
-		"|",
-		"enter",	
-		"a",
-		"A",
-		"s",
-		"S",
-		"d",
-		"f",
-		"F",
-		"g",
-		"G",
-		"h",
-		"H",
-		"j",
-		"k",
-		"K",
-		"l",
-		"L",
-		";",
-		"'",
-		"\"",
-		",",
-		"<",
-		".",
-		">",
-		"/",
-		"z",
-		"Z",
-		"x",
-		"X",
-		"c",
-		"v",
-		"V",
-		"b",
-		"B",
-		"n",
-		"N",
-		"m",
-		"M"
-		]
+order = [ "`", "~", "1", "!", "2", "3", "#",  "4", "$", "5",  "%", "6",					# Ocatve 1
+		  "7", "&", "8", "*", "9", "0", ")",  "-", "_", "=",  "+", "backspace",			# Ocatve 2
+		  "q", "Q", "w", "W", "e", "r", "R",  "t", "T", "y",  "Y", "u",					# Ocatve 3
+		  "i", "I", "o", "O", "p", "[", "{",  "]", "}", "\\", "|", "enter",				# Ocatve 4
+		  "a", "A", "s", "S", "d", "f", "F",  "g", "G", "h",  "H", "j",					# Ocatve 5
+		  "k", "K", "l", "L", ";", "'", "\"", ",", "<", ".",  ">", "/", 				# Ocatve 6
+		  "z", "Z", "x", "X", "c", "v", "V",  "b", "B", "n",  "N", "m",					# Ocatve 7
+		  "M" ]																			# C8
 
 class Piano:
 	def __init__(self, soundfont_path, transpose=0, sustain=False):
@@ -121,7 +42,7 @@ class Piano:
 			fluidsynth.play_Note(Note("C", octave))
 			time.sleep(0.1)
 
-		# Start GUI
+		# Start GUI - TODO
 
 	def key(self, callback):
 		'''
@@ -136,7 +57,7 @@ class Piano:
 				# If key is not pressed
 				if self.pressed_array[index] is False: 
 					# Transpose the note index by 12 semitones - starts at lower octave
-					n = Note().from_int(index+12+self.transposition) 
+					n = Note().from_int(index + 12 + self.transposition) 
 					
 					fluidsynth.play_Note(n) 				# Play note
 					self.pressed_array[index] = True 		# The key is now pressed

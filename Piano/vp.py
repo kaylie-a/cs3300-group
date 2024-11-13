@@ -83,13 +83,15 @@ B_POSITION = [ 1,  3,  -1, 6,  8,  10, -1,
 
 # pygame.Rect( x_pos, y_pos, rect_width, rect_height )	==>	anchor point is top left
 # Left side menu
-note_label_toggle = pygame.Rect(10, 10, 50, 50)
-keybind_toggle = pygame.Rect(10, 70, 50, 50)
-freeplay_button = pygame.Rect(10, 130, 50, 50)
-learning_button = pygame.Rect(10, 190, 50, 50)
-inc_piano_vol = pygame.Rect(10, 250, 50, 50)
-low_piano_vol = pygame.Rect(10, 310, 50, 50)
-info_button = pygame.Rect(10, 370, 50, 50)
+freeplay_button = pygame.Rect(10, 10, 50, 50)
+learning_button = pygame.Rect(10, 70, 50, 50)
+note_label_toggle = pygame.Rect(10, 130, 50, 50)
+keybind_toggle = pygame.Rect(10, 190, 50, 50)
+transpose_up = pygame.Rect(10, 250, 50, 50)
+transpose_down = pygame.Rect(10, 310, 50, 50)
+inc_piano_vol = pygame.Rect(10, 370, 50, 50)
+low_piano_vol = pygame.Rect(10, 430, 50, 50)
+info_button = pygame.Rect(10, 490, 50, 50)
 
 # Right side menu
 file_button = pygame.Rect(1490, 10, 50, 50)
@@ -278,7 +280,6 @@ class Piano:
 		self.black_key_height = 125
 		self.pressed_array = [False]*len(self.order)
 		self.mode = True
-		self.song_title = "Select MIDI file..."
 		screen.fill(LIGHT_GRAY)
 		self.draw_piano()
 
@@ -288,6 +289,8 @@ class Piano:
 		pygame.draw.rect(screen, (220, 87, 154), keybind_toggle)
 		pygame.draw.rect(screen, (145, 0, 255), freeplay_button)
 		pygame.draw.rect(screen, (240, 137, 247), learning_button)
+		pygame.draw.rect(screen, (106, 185, 114), transpose_up)
+		pygame.draw.rect(screen, (106, 185, 114), transpose_down)
 		pygame.draw.rect(screen, (131, 177, 191), inc_piano_vol)
 		pygame.draw.rect(screen, (131, 177, 191), low_piano_vol)
 		pygame.draw.rect(screen, (124, 47, 129), info_button)
@@ -310,6 +313,7 @@ class Piano:
 		run = True
 		start = False
 		paused = False
+		song_volume = 2
 
 		while run:
 			for event in pygame.event.get():
@@ -335,6 +339,7 @@ class Piano:
 					elif freeplay_button.collidepoint(mouse_pos):
 						self.menu_freeplay()
 						start = True
+						mixer.music.stop()
 
 					elif learning_button.collidepoint(mouse_pos):
 						self.menu_learning()
@@ -350,6 +355,12 @@ class Piano:
 						self.song_title = self.song_title.replace("-", " ").replace("_", " ")
 						self.song_title = self.song_title.title()
 
+					elif transpose_up.collidepoint(mouse_pos):
+						self.semitone += 1
+
+					elif transpose_down.collidepoint(mouse_pos):
+						self.semitone -= 1
+
 					elif inc_piano_vol.collidepoint(mouse_pos):
 						pass
 
@@ -364,11 +375,11 @@ class Piano:
 					elif play_button.collidepoint(mouse_pos):
 						try:
 							mixer.music.load(self.filename)
-							mixer.music.set_volume(5)
+							mixer.music.set_volume(song_volume)
 							if paused == False:
 								mixer.music.play()
 							else:
-								print("unpause")
+								print("unpause")				# TODO
 								mixer.music.unpause()
 						except Exception as e:
 							print(e)
@@ -386,9 +397,11 @@ class Piano:
 					elif metronome_button.collidepoint(mouse_pos):
 						pass
 					elif inc_song_vol.collidepoint(mouse_pos):
-						pass
+						song_volume += 0.2
+						mixer.music.set_volume(song_volume)
 					elif low_song_vol.collidepoint(mouse_pos):
-						pass
+						song_volume -= 0.2
+						mixer.music.set_volume(song_volume)
 
 			if start == False:
 				pygame.draw.rect(screen, WHITE, welcome_screen)

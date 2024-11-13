@@ -254,7 +254,11 @@ class Piano:
 			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 10)))
 			screen.blit(label, label_rect)
 
-			if BLACKS[i % 12] == True:
+			if BLACKS[i % 12] == False:
+				label = pygame.font.Font(font,8).render(self.order[i], True, BLACK)
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 10)))
+				screen.blit(label, label_rect)
+			else:
 				label = pygame.font.Font(font,8).render(self.order[i], True, WHITE)
 				label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 10)))
 				screen.blit(label, label_rect)

@@ -26,7 +26,7 @@ SCREEN_WIDTH  = pygame.display.Info().current_w
 SCREEN_HEIGHT = pygame.display.Info().current_h
 
 font = pygame.font.match_font('arial')
-screen = pygame.display.set_mode([SCREEN_WIDTH*0.95, SCREEN_HEIGHT*0.95])
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT*0.93])
 screen.fill(LIGHT_GRAY)
 
 digipiano_icon = pygame.image.load("icons\DigiPianoTestIcon.png")

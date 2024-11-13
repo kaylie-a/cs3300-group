@@ -16,10 +16,9 @@ config.read('settings.ini')
 
 soundfont_path = config['PIANO']['instrument']
 transposition = int(config['PIANO']['transposition'])
-sustain = bool(config['PIANO']['sustain'])
 volume = int(config['PIANO']['volume'])
 
-b1 = vp.Piano(soundfont_path, transpose=transposition, sustain=sustain)
+b1 = vp.Piano(soundfont_path, transpose=transposition)
 b1.volume = volume
 while True:
 	time.sleep(5)

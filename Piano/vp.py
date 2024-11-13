@@ -1,9 +1,11 @@
 import keyboard
 import time
 import pygame
+from pygame import mixer
 from mingus.midi import fluidsynth
 from mingus.containers.note import Note 
 from sys import exit
+from tkinter import filedialog
 
 # Constants
 SCREEN_WIDTH  = 1920
@@ -19,7 +21,11 @@ LIGHT_GRAY  = (100, 100, 100)
 KEY_BORDER  = (200, 200, 200)
 
 pygame.init()
+mixer.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+digipiano_icon = pygame.image.load("icons\DigiPianoTestIcon.png")
+pygame.display.set_icon(digipiano_icon)
+pygame.display.set_caption('DigiPiano')
 screen.fill(LIGHT_GRAY)
 clock = pygame.time.Clock()
 total_keys = []
@@ -27,12 +33,12 @@ pygame.display.flip()
 
 # Keybinds for 5 octaves --------------------------------------------------------------------------------------
 '''        C        C#    D     D#    E     F     F#    G     G#    A     A#     B '''				# Keybinds for piano
-oct_5 = [ "esc",   "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11",				# Octave 1
+OCT_5 = [ "esc",   "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11",				# Octave 1
 		  "1",     "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "0",  "-",   "=", 				# Octave 2
 	      "q",     "w",  "e",  "r",  "t",  "y",  "u",  "i",  "o",  "p",  "[",   "]", 				# Octave 3
 	      "a",     "s",  "d",  "f",  "g",  "h",  "j",  "k",  "l",  ";",  "'",   "enter", 			# Octave 4
 		  "shift", "z",  "x",  "c",  "v",  "b",  "n",  "m",  ",",  ".",  "/",   "right shift" ]		# Octave 5
-TOTAL_KEYS_5    = 35			# Total white keys
+'''TOTAL_KEYS_5    = 35			# Total white keys
 SEMITONE_5      = 24			# Pitch shift
 X_OFFSET_5      = 155
 Y_OFFSET_FPM_5  = 480			# Center
@@ -40,12 +46,12 @@ Y_OFFSET_LM_5   = 860			# Bottom
 WHITE_KEY_WIDTH_5  = 45
 WHITE_KEY_HEIGHT_5 = 200
 BLACK_KEY_WIDTH_5  = 27
-BLACK_KEY_HEIGHT_5 = 125
+BLACK_KEY_HEIGHT_5 = 125'''
 
 # Hands for 2 octaves -----------------------------------------------------------------------------------------
 '''         C    C#   D    D#   E    F    F#   G    G#   A    A#   B '''							# Keybinds for piano
-l_hand = [ "q", "2", "w", "3", "e", "r", "5", "t", "6", "y", "7", "u" ]								# Left octave
-r_hand = [ "b", "h", "n", "j", "m", ",", "l", ".", ";", "/", "'", "right shift" ]					# Right octave
+L_HAND = [ "q", "2", "w", "3", "e", "r", "5", "t", "6", "y", "7", "u" ]								# Left octave
+R_HAND = [ "b", "h", "n", "j", "m", ",", "l", ".", ";", "/", "'", "right shift" ]					# Right octave
 TOTAL_KEYS_2    = 7				# Total white keys
 SEMITONE_2      = 36			# Pitch shift
 X_OFFSET_2      = 500
@@ -56,10 +62,10 @@ BLACK_KEY_WIDTH_2  = 37
 BLACK_KEY_HEIGHT_2 = 160
 
 # Indicates which are black keys (True) -----------------------------------------------------------------------
-blacks = [ False, True, False, True, False, False, True, False, True, False, True, False ]
+BLACKS = [ False, True, False, True, False, False, True, False, True, False, True, False ]
 
 # White key positions - up to 5 octaves
-w_position = [ 0,  2,  4,  5,  7,  9,  11, 
+W_POSITION = [ 0,  2,  4,  5,  7,  9,  11, 
 			   12, 14, 16, 17, 19, 21, 23, 
 			   24, 26, 28, 29, 31, 33, 35, 
 			   36, 38, 40, 41, 43, 45, 47, 
@@ -67,7 +73,7 @@ w_position = [ 0,  2,  4,  5,  7,  9,  11,
 
 # Black key positions
 # -1: no black keys on E and B
-b_position = [ 1,  3,  -1, 6,  8,  10, -1, 
+B_POSITION = [ 1,  3,  -1, 6,  8,  10, -1, 
 			   13, 15, -1, 18, 20, 22, -1, 
 			   25, 27, -1, 30, 32, 34, -1, 
 			   37, 39, -1, 42, 44, 46, -1, 
@@ -76,12 +82,30 @@ b_position = [ 1,  3,  -1, 6,  8,  10, -1,
 # -------------------------------------------------------------------------------------------------------------
 
 # pygame.Rect( x_pos, y_pos, rect_width, rect_height )	==>	anchor point is top left
-freeplay_button = pygame.Rect(10, 10, 50, 50)
-learning_button = pygame.Rect(10, 70, 50, 50)
+# Left side menu
+note_label_toggle = pygame.Rect(10, 10, 50, 50)
+keybind_toggle = pygame.Rect(10, 70, 50, 50)
+freeplay_button = pygame.Rect(10, 130, 50, 50)
+learning_button = pygame.Rect(10, 190, 50, 50)
+inc_piano_vol = pygame.Rect(10, 250, 50, 50)
+low_piano_vol = pygame.Rect(10, 310, 50, 50)
+info_button = pygame.Rect(10, 370, 50, 50)
+
+# Right side menu
+file_button = pygame.Rect(1490, 10, 50, 50)
+song_title_button = pygame.Rect(1550, 10, 360, 50)
+play_button = pygame.Rect(1860, 70, 50, 50)
+pause_button = pygame.Rect(1860, 130, 50, 50)
+slow_button = pygame.Rect(1860, 190, 50, 50)
+fast_button = pygame.Rect(1860, 250, 50, 50)
+metronome_button = pygame.Rect(1860, 310, 50, 50)
+inc_song_vol = pygame.Rect(1860, 370, 50, 50)
+low_song_vol = pygame.Rect(1860, 430, 50, 50)
+
 welcome_screen = pygame.Rect(660, 390, 600, 300)
 
 class Piano:
-	def __init__(self, soundfont_path, transpose=0, sustain=False):
+	def __init__(self, soundfont_path, transpose=0):
 		self.transposition = transpose
 		self.soundfont_path = soundfont_path
 		self.order = []
@@ -89,7 +113,8 @@ class Piano:
 		self.semitone = 24
 		self.channel = 0
 		self.volume_value = 128
-		self.sustain = sustain
+		self.sustain = False
+		self.mode = False			# Freeplay Mode: False, Learning Mode: True
 
 		self.total_key_num = 0
 		self.x_offset      = 0
@@ -98,6 +123,9 @@ class Piano:
 		self.white_key_height = 0
 		self.black_key_width  = 0
 		self.black_key_height = 0
+
+		self.filename = " "
+		self.song_title = "Select MIDI file..."
 
 		# Initialize and run piano
 		self.init()
@@ -128,6 +156,7 @@ class Piano:
 		try:
 			index = self.order.index(callback.name)
 			# DOWN event
+			
 			if callback.event_type == 'down': 
 				# If key is not pressed
 				if self.pressed_array[index] is False: 
@@ -148,29 +177,41 @@ class Piano:
 	# Updates GUI, shows on piano when a key is pressed
 	def press_key(self, index):
 		# White key
-		if blacks[index % 12] == False:
-			i = w_position.index(index)
-			total_keys[index] = pygame.draw.rect(screen, WHITE_PRESS, (self.x_offset + i * self.white_key_width, self.y_offset, self.white_key_width, self.white_key_height))
+		if BLACKS[index % 12] == False:
+			i = W_POSITION.index(index)
+			total_keys[index] = pygame.draw.rect(screen, WHITE_PRESS, (self.x_offset + i * self.white_key_width, 
+															  		   self.y_offset, 
+																	   self.white_key_width, 
+																	   self.white_key_height))
 			self.draw_black_keys()
 			pygame.display.update()
 		# Black key
 		else:
-			i = b_position.index(index)
-			total_keys[index] = pygame.draw.rect(screen, BLACK_PRESS, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, self.y_offset, self.black_key_width, self.black_key_height))
+			i = B_POSITION.index(index)
+			total_keys[index] = pygame.draw.rect(screen, BLACK_PRESS, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, 
+															  		   self.y_offset, 
+																	   self.black_key_width, 
+																	   self.black_key_height))
 			pygame.display.update()
 
 	# Updates GUI, shows on piano when a key is released
 	def release_key(self, index):
 		# White key
-		if blacks[index % 12] == False:
-			i = w_position.index(index)
-			total_keys[index] = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width, self.y_offset, self.white_key_width, self.white_key_height))
+		if BLACKS[index % 12] == False:
+			i = W_POSITION.index(index)
+			total_keys[index] = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width, 
+																 self.y_offset, 
+																 self.white_key_width, 
+																 self.white_key_height))
 			self.draw_piano()
 			pygame.display.update()
 		# Black key
 		else:
-			i = b_position.index(index)
-			total_keys[index] = pygame.draw.rect(screen, BLACK, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, self.y_offset, self.black_key_width, self.black_key_height))
+			i = B_POSITION.index(index)
+			total_keys[index] = pygame.draw.rect(screen, BLACK, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, 
+																 self.y_offset, 
+																 self.black_key_width, 
+																 self.black_key_height))
 			self.draw_piano()
 			pygame.display.update()
 
@@ -178,8 +219,14 @@ class Piano:
 	def draw_piano(self):
     	# Draw white keys and border
 		for i in range(self.total_key_num):
-			key = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width, self.y_offset, self.white_key_width, self.white_key_height))
-			pygame.draw.rect(screen, KEY_BORDER, (self.x_offset + i * self.white_key_width, self.y_offset, self.white_key_width, self.white_key_height), 1)
+			key = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width, 
+										  		   self.y_offset, 
+												   self.white_key_width, 
+												   self.white_key_height))
+			pygame.draw.rect(screen, KEY_BORDER, (self.x_offset + i * self.white_key_width, 
+										 		  self.y_offset, 
+												  self.white_key_width, 
+												  self.white_key_height), 1)
 			total_keys.append(key)
 
 		self.draw_black_keys()
@@ -193,8 +240,10 @@ class Piano:
 		for i in range(self.total_key_num):
 			# Skip keys for E and B
 			if skip_count != 2 and skip_count != 6:
-				pygame.draw.rect(screen, BLACK, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, self.y_offset, self.black_key_width, self.black_key_height))
-				#total_keys[i] = key
+				pygame.draw.rect(screen, BLACK, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, 
+									 			 self.y_offset, 
+												 self.black_key_width, 
+												 self.black_key_height))
 
 			skip_count += 1
 
@@ -202,50 +251,65 @@ class Piano:
 			if skip_count == 7:
 				skip_count = 0
 
-	def menu_freeplay(self):		# implement 2 octave and 5 octave?
-		print("Freeplay Mode")
-
-		self.total_key_num = TOTAL_KEYS_5
-		self.order    = oct_5
-		self.semitone = SEMITONE_5
-		self.x_offset     = X_OFFSET_5
-		self.y_offset = Y_OFFSET_FPM_5
-		self.white_key_width  = WHITE_KEY_WIDTH_5
-		self.white_key_height = WHITE_KEY_HEIGHT_5
-		self.black_key_width  = BLACK_KEY_WIDTH_5
-		self.black_key_height = BLACK_KEY_HEIGHT_5
+	def menu_freeplay(self):		# implement 2 octave and 5 octave
+		self.total_key_num = 35
+		self.order    = OCT_5
+		self.semitone = 24
+		self.x_offset = 155
+		self.y_offset = 480
+		self.white_key_width  = 45
+		self.white_key_height = 200
+		self.black_key_width  = 27
+		self.black_key_height = 125
 		self.pressed_array = [False]*len(self.order)
-
+		self.mode = False
 		screen.fill(LIGHT_GRAY)
 		self.draw_piano()
 
 	def menu_learning(self):
-		print("Learning Mode")
-
-		self.total_key_num = TOTAL_KEYS_5
-		self.order    = oct_5
-		self.semitone = SEMITONE_5
-		self.x_offset = X_OFFSET_5
-		self.y_offset = Y_OFFSET_LM_5
-		self.white_key_width  = WHITE_KEY_WIDTH_5
-		self.white_key_height = WHITE_KEY_HEIGHT_5
-		self.black_key_width  = BLACK_KEY_WIDTH_5
-		self.black_key_height = BLACK_KEY_HEIGHT_5
+		self.total_key_num = 35
+		self.order    = OCT_5
+		self.semitone = 24
+		self.x_offset = 155
+		self.y_offset = 860
+		self.white_key_width  = 45
+		self.white_key_height = 200
+		self.black_key_width  = 27
+		self.black_key_height = 125
 		self.pressed_array = [False]*len(self.order)
-
+		self.mode = True
+		self.song_title = "Select MIDI file..."
 		screen.fill(LIGHT_GRAY)
 		self.draw_piano()
 
 	# Draws menu buttons
 	def draw_menu(self):
-		pygame.draw.rect(screen, (255, 0, 0), freeplay_button)
-		pygame.draw.rect(screen, (0, 0, 255), learning_button)
-		# implement button text
+		pygame.draw.rect(screen, (238, 137, 147), note_label_toggle)
+		pygame.draw.rect(screen, (220, 87, 154), keybind_toggle)
+		pygame.draw.rect(screen, (145, 0, 255), freeplay_button)
+		pygame.draw.rect(screen, (240, 137, 247), learning_button)
+		pygame.draw.rect(screen, (131, 177, 191), inc_piano_vol)
+		pygame.draw.rect(screen, (131, 177, 191), low_piano_vol)
+		pygame.draw.rect(screen, (124, 47, 129), info_button)
+
+		if self.mode == True:
+			pygame.draw.rect(screen, (255, 255, 255), file_button)
+			pygame.draw.rect(screen, (255, 255, 255), song_title_button)
+			pygame.draw.rect(screen, (255, 255, 0), play_button)
+			pygame.draw.rect(screen, (255, 111, 0), pause_button)
+			pygame.draw.rect(screen, (0, 0, 255), slow_button)
+			pygame.draw.rect(screen, (255, 0, 0), fast_button)
+			pygame.draw.rect(screen, (0, 255, 255), metronome_button)
+			pygame.draw.rect(screen, (131, 145, 191), inc_song_vol)
+			pygame.draw.rect(screen, (131, 145, 191), low_song_vol)
+			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (1560, 25))
+		# implement button text/icon images
 
 	# Run pygame and piano interface
 	def play_piano(self):
 		run = True
 		start = False
+		paused = False
 
 		while run:
 			for event in pygame.event.get():
@@ -259,13 +323,72 @@ class Piano:
 				if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 					mouse_pos = event.pos
 
+					# Left side menu --------------------------------------------------------------------------------------------------------
+
 					# Check which button is pressed
-					if freeplay_button.collidepoint(mouse_pos):
+					if note_label_toggle.collidepoint(mouse_pos):
+						pass
+
+					elif keybind_toggle.collidepoint(mouse_pos):
+						pass
+					
+					elif freeplay_button.collidepoint(mouse_pos):
 						self.menu_freeplay()
 						start = True
+
 					elif learning_button.collidepoint(mouse_pos):
 						self.menu_learning()
 						start = True
+
+					elif file_button.collidepoint(mouse_pos):
+						# Open file select
+						self.filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:")
+						
+						# Remove path, extension name, and capitalize
+						self.song_title = self.filename.split("/")[-1]
+						self.song_title = self.song_title.split(".")[0]
+						self.song_title = self.song_title.replace("-", " ").replace("_", " ")
+						self.song_title = self.song_title.title()
+
+					elif inc_piano_vol.collidepoint(mouse_pos):
+						pass
+
+					elif low_piano_vol.collidepoint(mouse_pos):
+						pass
+
+					elif info_button.collidepoint(mouse_pos):
+						pass
+
+					# Right side menu -------------------------------------------------------------------------------------------------------
+
+					elif play_button.collidepoint(mouse_pos):
+						try:
+							mixer.music.load(self.filename)
+							mixer.music.set_volume(5)
+							if paused == False:
+								mixer.music.play()
+							else:
+								print("unpause")
+								mixer.music.unpause()
+						except Exception as e:
+							print(e)
+							self.song_title = "No MIDI file found!"
+					elif pause_button.collidepoint(mouse_pos):
+						try:
+							mixer.music.pause()
+							paused = True	
+						except Exception as e:
+							print(e)
+					elif slow_button.collidepoint(mouse_pos):
+						pass
+					elif fast_button.collidepoint(mouse_pos):
+						pass
+					elif metronome_button.collidepoint(mouse_pos):
+						pass
+					elif inc_song_vol.collidepoint(mouse_pos):
+						pass
+					elif low_song_vol.collidepoint(mouse_pos):
+						pass
 
 			if start == False:
 				pygame.draw.rect(screen, WHITE, welcome_screen)

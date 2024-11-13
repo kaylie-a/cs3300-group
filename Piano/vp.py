@@ -108,7 +108,7 @@ metronome_button = pygame.Rect(1860, 310, 50, 50)
 inc_song_vol = pygame.Rect(1860, 370, 50, 50)
 low_song_vol = pygame.Rect(1860, 430, 50, 50)
 
-welcome_screen = pygame.Rect(660, 390, 600, 300)
+welcome_screen = pygame.Rect((SCREEN_WIDTH / 2) - 400, SCREEN_HEIGHT / 2 - 250, 800, 500)
 
 class Piano:
 	def __init__(self, soundfont_path, transpose=0):
@@ -378,11 +378,15 @@ class Piano:
 						# Open file select
 						self.filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:")
 
-						# Remove path, extension name, and capitalize
-						self.song_title = self.filename.split("/")[-1]
-						self.song_title = self.song_title.split(".")[0]
-						self.song_title = self.song_title.replace("-", " ").replace("_", " ")
-						self.song_title = self.song_title.title()
+						# Test if file type is valid
+						if self.test_MIDI() == True:
+							# Remove path, extension name, and capitalize
+							self.song_title = self.filename.split("/")[-1]
+							self.song_title = self.song_title.split(".")[0]
+							self.song_title = self.song_title.replace("-", " ").replace("_", " ")
+							self.song_title = self.song_title.title()
+						else:
+							self.song_title = "Invalid song type!"
 
 					elif transpose_up.collidepoint(mouse_pos):
 						self.semitone += 1
@@ -440,7 +444,17 @@ class Piano:
 			pygame.display.update()
 			clock.tick(FPS)
 
-	#def test_MIDI(self, )
+	# Tests if MIDI file is valid
+	def test_MIDI(self):
+		valid = False
+		file_type = self.filename.split("/")
+		file_type = file_type[len(file_type) - 1]
+		file_type = file_type.split(".")[1]
+		
+		if file_type == "mid":
+			valid = True
+
+		return valid
 	
 	@property
 	def volume(self):

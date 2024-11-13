@@ -7,9 +7,6 @@ from mingus.containers.note import Note
 from sys import exit
 from tkinter import filedialog
 
-# Constants
-SCREEN_WIDTH  = 1920
-SCREEN_HEIGHT = 1080
 FPS = 60
 
 # Colors
@@ -24,8 +21,12 @@ mixer.init()
 pygame.init()
 pygame.font.init()
 
+# Constants
+SCREEN_WIDTH  = pygame.display.Info().current_w
+SCREEN_HEIGHT = pygame.display.Info().current_h
+
 font = pygame.font.match_font('arial')
-screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+screen = pygame.display.set_mode([SCREEN_WIDTH*0.95, SCREEN_HEIGHT*0.95])
 screen.fill(LIGHT_GRAY)
 
 digipiano_icon = pygame.image.load("icons\DigiPianoTestIcon.png")

@@ -39,6 +39,9 @@ total_keys = []
 clock = pygame.time.Clock()
 pygame.display.flip()
 
+# Notes in each octave
+Notes = [ "C", "C#","D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+
 # Keybinds for 5 octaves --------------------------------------------------------------------------------------
 '''        C        C#    D     D#    E     F     F#    G     G#    A     A#     B '''				# Keybinds for piano
 OCT_5 = [ "esc",   "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11",				# Octave 1
@@ -249,7 +252,17 @@ class Piano:
 	# Draw note labels and keybinds on piano
 	def draw_labels(self, i):
 		if self.note_toggle:
-			pass
+			if self.note_toggle:
+				if BLACKS[i % 12] == False:
+					label = pygame.font.Font(font,12).render(Notes[i % 12], True, BLACK)
+					label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 20)))
+					screen.blit(label, label_rect)
+					print(Notes[i % 12])
+				#Label black keys #TODO - key bindings appear, but are behind the black keys
+				else:
+					label = pygame.font.Font(font,12).render(Notes[i % 12], True, WHITE)
+					label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 20)))
+					screen.blit(label, label_rect)
 		
 		if self.keybind_toggle:
 			#Label white keys

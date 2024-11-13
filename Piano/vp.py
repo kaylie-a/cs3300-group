@@ -20,15 +20,20 @@ BLACK_PRESS = (75, 75, 75)
 LIGHT_GRAY  = (100, 100, 100)
 KEY_BORDER  = (200, 200, 200)
 
-pygame.init()
 mixer.init()
+pygame.init()
+pygame.font.init()
+
+font = pygame.font.match_font('arial')
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+screen.fill(LIGHT_GRAY)
+
 digipiano_icon = pygame.image.load("icons\DigiPianoTestIcon.png")
 pygame.display.set_icon(digipiano_icon)
 pygame.display.set_caption('DigiPiano')
-screen.fill(LIGHT_GRAY)
-clock = pygame.time.Clock()
+
 total_keys = []
+clock = pygame.time.Clock()
 pygame.display.flip()
 
 # Keybinds for 5 octaves --------------------------------------------------------------------------------------
@@ -89,9 +94,7 @@ note_label_toggle = pygame.Rect(10, 130, 50, 50)
 keybind_toggle = pygame.Rect(10, 190, 50, 50)
 transpose_up = pygame.Rect(10, 250, 50, 50)
 transpose_down = pygame.Rect(10, 310, 50, 50)
-inc_piano_vol = pygame.Rect(10, 370, 50, 50)
-low_piano_vol = pygame.Rect(10, 430, 50, 50)
-info_button = pygame.Rect(10, 490, 50, 50)
+info_button = pygame.Rect(10, 370	, 50, 50)
 
 # Right side menu
 file_button = pygame.Rect(1490, 10, 50, 50)
@@ -128,6 +131,8 @@ class Piano:
 
 		self.filename = " "
 		self.song_title = "Select MIDI file..."
+		self.note_toggle = False
+		self.keybind_toggle = False		
 
 		# Initialize and run piano
 		self.init()
@@ -185,6 +190,8 @@ class Piano:
 															  		   self.y_offset, 
 																	   self.white_key_width, 
 																	   self.white_key_height))
+			self.draw_labels(i)
+			
 			self.draw_black_keys()
 			pygame.display.update()
 		# Black key
@@ -231,8 +238,25 @@ class Piano:
 												  self.white_key_height), 1)
 			total_keys.append(key)
 
+			self.draw_labels(i)
+
 		self.draw_black_keys()
 		pygame.display.flip()
+
+	# Draw note labels and keybinds on piano
+	def draw_labels(self, i):
+		if self.note_toggle:
+			pass
+		
+		if self.keybind_toggle:
+			label = pygame.font.Font(font,12).render(self.order[i], True, BLACK)
+			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 10)))
+			screen.blit(label, label_rect)
+
+			if BLACKS[i % 12] == True:
+				label = pygame.font.Font(font,8).render(self.order[i], True, WHITE)
+				label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 10)))
+				screen.blit(label, label_rect)
 
 	# Separate function for only black keys - highlight on white keys doesn't cover black keys
 	def draw_black_keys(self):
@@ -291,8 +315,6 @@ class Piano:
 		pygame.draw.rect(screen, (240, 137, 247), learning_button)
 		pygame.draw.rect(screen, (106, 185, 114), transpose_up)
 		pygame.draw.rect(screen, (106, 185, 114), transpose_down)
-		pygame.draw.rect(screen, (131, 177, 191), inc_piano_vol)
-		pygame.draw.rect(screen, (131, 177, 191), low_piano_vol)
 		pygame.draw.rect(screen, (124, 47, 129), info_button)
 
 		if self.mode == True:
@@ -330,13 +352,7 @@ class Piano:
 					# Left side menu --------------------------------------------------------------------------------------------------------
 
 					# Check which button is pressed
-					if note_label_toggle.collidepoint(mouse_pos):
-						pass
-
-					elif keybind_toggle.collidepoint(mouse_pos):
-						pass
-					
-					elif freeplay_button.collidepoint(mouse_pos):
+					if freeplay_button.collidepoint(mouse_pos):
 						self.menu_freeplay()
 						start = True
 						mixer.music.stop()
@@ -345,10 +361,18 @@ class Piano:
 						self.menu_learning()
 						start = True
 
+					elif note_label_toggle.collidepoint(mouse_pos):
+						self.note_toggle = (not self.note_toggle)
+						self.draw_piano()
+
+					elif keybind_toggle.collidepoint(mouse_pos):
+						self.keybind_toggle = (not self.keybind_toggle)
+						self.draw_piano()
+
 					elif file_button.collidepoint(mouse_pos):
 						# Open file select
 						self.filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:")
-						
+
 						# Remove path, extension name, and capitalize
 						self.song_title = self.filename.split("/")[-1]
 						self.song_title = self.song_title.split(".")[0]
@@ -360,12 +384,6 @@ class Piano:
 
 					elif transpose_down.collidepoint(mouse_pos):
 						self.semitone -= 1
-
-					elif inc_piano_vol.collidepoint(mouse_pos):
-						pass
-
-					elif low_piano_vol.collidepoint(mouse_pos):
-						pass
 
 					elif info_button.collidepoint(mouse_pos):
 						pass
@@ -384,21 +402,27 @@ class Piano:
 						except Exception as e:
 							print(e)
 							self.song_title = "No MIDI file found!"
+
 					elif pause_button.collidepoint(mouse_pos):
 						try:
 							mixer.music.pause()
 							paused = True	
 						except Exception as e:
 							print(e)
+
 					elif slow_button.collidepoint(mouse_pos):
 						pass
+
 					elif fast_button.collidepoint(mouse_pos):
 						pass
+
 					elif metronome_button.collidepoint(mouse_pos):
 						pass
+
 					elif inc_song_vol.collidepoint(mouse_pos):
 						song_volume += 0.2
 						mixer.music.set_volume(song_volume)
+
 					elif low_song_vol.collidepoint(mouse_pos):
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
@@ -410,6 +434,8 @@ class Piano:
 			self.draw_menu()
 			pygame.display.update()
 			clock.tick(FPS)
+
+	#def test_MIDI(self, )
 	
 	@property
 	def volume(self):

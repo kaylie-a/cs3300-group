@@ -40,22 +40,19 @@ total_keys = []
 clock = pygame.time.Clock()
 pygame.display.flip()
 
-# Notes in each octave
-Notes = [ "C", "C#","D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" ]
-
 white_notes = [ "C",  "D",  "E",  "F", "G",  "A",  "B" ]
-black_notes = [ "C#", "D#", "F#", " ", "G#", "A#", " " ]
+black_notes = [ "C#", "D#", " ",  "F#" "G#", "A#", " " ]
 
 white_order = [ "esc", "f2", "f4", "f5", "f7", "f9", "f11",
 			    "1",   "3",  "5",  "6",  "8",  "0",  "=",
 				"q",   "e",  "t",  "y",  "i",  "p",  "]",
 				"a",   "d",  "g",  "h",  "k",  ";",  "ret",
 				"sh",  "x",  "v",  "b",  "m",  ".",  "rsh" ]
-black_order = [ "f1", "f3", "f6", "f8", "f10",
-			    "2",  "4",  "7",  "9",  "-",
-				"w",  "r",  "u",  "o",  "[",
-				"s",  "f",  "j",  "l",  "'",
-				"z",  "c",  "n",  ",",  "/" ]
+black_order = [ "f1", "f3", " ", "f6", "f8", "f10", " ",
+			    "2",  "4",  " ", "7",  "9",  "-",  " ",
+				"w",  "r",  " ", "u",  "o",  "[",  " ",
+				"s",  "f",  " ", "j",  "l",  "'",  " ",
+				"z",  "c",  " ", "n",  ",",  "/",  " " ]
 
 # Keybinds for 5 octaves --------------------------------------------------------------------------------------
 '''        C        C#    D     D#    E     F     F#    G     G#    A     A#     B '''				# Keybinds for piano
@@ -175,6 +172,8 @@ low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
 welcome_screen = pygame.Rect((SCREEN_WIDTH / 2) - 400, SCREEN_HEIGHT / 2 - 250, 800, 500)
 
+# ----------------------------
+
 class Piano:
 	def __init__(self, soundfont_path, transpose=0):
 		self.transposition = transpose
@@ -197,8 +196,11 @@ class Piano:
 
 		self.filename = " "
 		self.song_title = "Select MIDI file..."
+
 		self.note_toggle = False
-		self.keybind_toggle = False		
+		self.note_toggle_on = 0
+		self.keybind_toggle = False
+		self.keybind_toggle_on = 0
 
 		# Initialize and run piano
 		self.init()
@@ -265,7 +267,6 @@ class Piano:
 																	   self.black_key_width, 
 																	   self.black_key_height))
 			
-		self.draw_labels()
 		pygame.display.update()
 
 	# Updates GUI, shows on piano when a key is released
@@ -285,11 +286,11 @@ class Piano:
 																 self.black_key_width, 
 																 self.black_key_height))
 		
-		self.draw_piano()
+		self.draw_white_keys()
 		pygame.display.update()
 
 	# Draw the keys
-	def draw_piano(self):
+	def draw_white_keys(self):
     	# Draw white keys and border
 		for i in range(self.total_key_num):
 			key = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width, 
@@ -301,6 +302,9 @@ class Piano:
 												  self.white_key_width, 
 												  self.white_key_height), 1)
 			total_keys.append(key)
+
+			if self.note_toggle_on == 0 or self.keybind_toggle_on == 0:
+				self.draw_labels(i, False)
 
 		self.draw_black_keys()
 		pygame.display.flip()
@@ -317,6 +321,8 @@ class Piano:
 									 			 self.y_offset, 
 												 self.black_key_width, 
 												 self.black_key_height))
+			if self.note_toggle_on == 0 or self.keybind_toggle_on == 0:
+				self.draw_labels(i, True)
 
 			skip_count += 1
 
@@ -324,31 +330,32 @@ class Piano:
 			if skip_count == 7:
 				skip_count = 0
 
-		self.draw_labels()
-
+			
 	# Draw note labels and keybinds on piano
-	def draw_labels(self):
-		for i in range(self.total_key_num):
-			if self.note_toggle:
-				label = pygame.font.Font(font,16).render(white_notes[i % 7], True, BLACK)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 35)))
-				screen.blit(label, label_rect)
+	def draw_labels(self, i, black_key):
+		if self.note_toggle:
+			# Label white keys: 7 white keys per octave
+			label = pygame.font.Font(font,16).render(white_notes[i % 7], True, BLACK)
+			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height + 15)))			# - 35
+			screen.blit(label, label_rect)
 
-				#Label black keys #TODO - key bindings appear, but incorrect spacing
-				label = pygame.font.Font(font,12).render(black_notes[i % 7], True, GREEN)
-				label_rect = label.get_rect(center=((self.x_offset + 20 + i * self.black_key_width * 1.5) + self.black_key_width, (self.y_offset + self.black_key_height - 30)))
+			# Label black keys: 5 black keys per octave				 TODO - key bindings appear, but incorrect spacing
+			if black_key == True:
+				label = pygame.font.Font(font,12).render(black_notes[i % 5], True, GREEN)
+				label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height + 110)))		# - 30
 				screen.blit(label, label_rect)			
-		
-			if self.keybind_toggle:
-				#Label white keys
-				label = pygame.font.Font(font,16).render(white_order[i], True, BLACK)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 15)))
+	
+		if self.keybind_toggle:
+			# Label white keys: 7 white keys per octave
+			label = pygame.font.Font(font,16).render(white_order[i], True, BLACK)
+			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 215)))			# - 15
+			screen.blit(label, label_rect)
+
+			# Label black keys: 5 black keys per octave				 TODO - key bindings appear, but incorrect spacing
+			if black_key == True:
+				label = pygame.font.Font(font,12).render(black_order[i], True, GREEN)
+				label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 165)))		# - 10
 				screen.blit(label, label_rect)
-				#Label black keys #TODO - key bindings appear, but incorrect spacing
-				if BLACKS[i % 12] == True:
-					label = pygame.font.Font(font,12).render(self.order[i], True, GREEN)
-					label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 10)))
-					screen.blit(label, label_rect)
 
 	def menu_freeplay(self):
 		self.total_key_num = 35
@@ -362,23 +369,35 @@ class Piano:
 		self.black_key_height = 125
 		self.pressed_array = [False]*len(self.order)
 		self.mode = False
+
+		self.note_toggle = False		# Need to reset, otherwise breaks piano visuals
+		self.note_toggle_on = 0
+		self.keybind_toggle = False
+		self.keybind_toggle_on = 0
+
 		screen.fill(LIGHT_GRAY)
-		self.draw_piano()
+		self.draw_white_keys()
 
 	def menu_learning(self):
 		self.total_key_num = 35
 		self.order    = OCT_5
 		self.semitone = 24
 		self.x_offset = 235
-		self.y_offset = SCREEN_HEIGHT - 320
+		self.y_offset = SCREEN_HEIGHT - 340
 		self.white_key_width  = 45
 		self.white_key_height = 200
 		self.black_key_width  = 27
 		self.black_key_height = 125
 		self.pressed_array = [False]*len(self.order)
 		self.mode = True
+
+		self.note_toggle = False		# Need to reset, otherwise breaks piano visuals
+		self.note_toggle_on = 0
+		self.keybind_toggle = False
+		self.keybind_toggle_on = 0
+
 		screen.fill(LIGHT_GRAY)
-		self.draw_piano()
+		self.draw_white_keys()
 
 	# Draws menu buttons
 	def draw_menu(self):
@@ -430,9 +449,8 @@ class Piano:
 				if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 					mouse_pos = event.pos
 
-					# Left side menu --------------------------------------------------------------------------------------------------------
-
 					# Check which button is pressed
+					# Left side menu --------------------------------------------------------------------------------------------------------
 					if freeplay_button.collidepoint(mouse_pos):
 						self.menu_freeplay()
 						start = True
@@ -444,11 +462,27 @@ class Piano:
 
 					elif note_toggle.collidepoint(mouse_pos):
 						self.note_toggle = (not self.note_toggle)
-						self.draw_piano()
+						self.draw_white_keys()
+						if self.note_toggle == True:
+							self.note_toggle_on += 1
+						else:
+							screen.fill(LIGHT_GRAY)
+							self.draw_white_keys()
+							self.note_toggle_on = 0
+							if self.keybind_toggle == True:
+								self.draw_white_keys()
 
 					elif keybind_toggle.collidepoint(mouse_pos):
 						self.keybind_toggle = (not self.keybind_toggle)
-						self.draw_piano()
+						self.draw_white_keys()
+						if self.keybind_toggle == True:
+							self.keybind_toggle_on += 1
+						else:
+							screen.fill(LIGHT_GRAY)
+							self.draw_white_keys()
+							self.keybind_toggle_on = 0
+							if self.note_toggle == True:
+								self.draw_white_keys()
 
 					elif file_button.collidepoint(mouse_pos):
 						#Open file select

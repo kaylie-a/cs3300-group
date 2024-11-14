@@ -31,7 +31,7 @@ font = pygame.font.match_font('arial')
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT*0.93])
 screen.fill(LIGHT_GRAY)
 
-digipiano_icon = pygame.image.load("icons\DigiPianoTestIcon.png")
+digipiano_icon = pygame.image.load("icons\DigiPiano-icon.png")
 pygame.display.set_icon(digipiano_icon)
 pygame.display.set_caption('DigiPiano')
 
@@ -100,18 +100,18 @@ note_label_toggle = pygame.Rect(10, 130, 50, 50)
 keybind_toggle = pygame.Rect(10, 190, 50, 50)
 transpose_up = pygame.Rect(10, 250, 50, 50)
 transpose_down = pygame.Rect(10, 310, 50, 50)
-info_button = pygame.Rect(10, 370	, 50, 50)
+info_button = pygame.Rect(10, 370, 50, 50)
 
 # Right side menu
-file_button = pygame.Rect(1490, 10, 50, 50)
-song_title_button = pygame.Rect(1550, 10, 360, 50)
-play_button = pygame.Rect(1860, 70, 50, 50)
-pause_button = pygame.Rect(1860, 130, 50, 50)
-slow_button = pygame.Rect(1860, 190, 50, 50)
-fast_button = pygame.Rect(1860, 250, 50, 50)
-metronome_button = pygame.Rect(1860, 310, 50, 50)
-inc_song_vol = pygame.Rect(1860, 370, 50, 50)
-low_song_vol = pygame.Rect(1860, 430, 50, 50)
+file_button = pygame.Rect(SCREEN_WIDTH - 430, 10, 50, 50)
+song_title_button = pygame.Rect(SCREEN_WIDTH - 370, 10, 360, 50)
+play_button = pygame.Rect(SCREEN_WIDTH - 60, 70, 50, 50)
+pause_button = pygame.Rect(SCREEN_WIDTH - 60, 130, 50, 50)
+slow_button = pygame.Rect(SCREEN_WIDTH - 60, 190, 50, 50)
+fast_button = pygame.Rect(SCREEN_WIDTH - 60, 250, 50, 50)
+metronome_button = pygame.Rect(SCREEN_WIDTH - 60, 310, 50, 50)
+inc_song_vol = pygame.Rect(SCREEN_WIDTH - 60, 370, 50, 50)
+low_song_vol = pygame.Rect(SCREEN_WIDTH - 60, 430, 50, 50)
 
 welcome_screen = pygame.Rect((SCREEN_WIDTH / 2) - 400, SCREEN_HEIGHT / 2 - 250, 800, 500)
 
@@ -345,7 +345,7 @@ class Piano:
 			pygame.draw.rect(screen, (0, 255, 255), metronome_button)
 			pygame.draw.rect(screen, (131, 145, 191), inc_song_vol)
 			pygame.draw.rect(screen, (131, 145, 191), low_song_vol)
-			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (1560, 25))
+			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 25))
 		# implement button text/icon images
 
 	# Run pygame and piano interface
@@ -388,18 +388,9 @@ class Piano:
 						self.draw_piano()
 
 					elif file_button.collidepoint(mouse_pos):
-						# Open file select
-						self.filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:")
-
-						# Test if file type is valid
-						if self.test_MIDI() == True:
-							# Remove path, extension name, and capitalize
-							self.song_title = self.filename.split("/")[-1]
-							self.song_title = self.song_title.split(".")[0]
-							self.song_title = self.song_title.replace("-", " ").replace("_", " ")
-							self.song_title = self.song_title.title()
-						else:
-							self.song_title = "Invalid song type!"
+						#Open file select
+						filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:", filetypes=[("MIDI files", "*.mid")])
+						self.test_MIDI(filename)
 
 					elif transpose_up.collidepoint(mouse_pos):
 						self.semitone += 1
@@ -458,16 +449,23 @@ class Piano:
 			clock.tick(FPS)
 
 	# Tests if MIDI file is valid
-	def test_MIDI(self):
-		valid = False
-		file_type = self.filename.split("/")
+	def test_MIDI(self, filename):
+		# Separate file extension name
+		file_type = filename.split("/")
 		file_type = file_type[len(file_type) - 1]
 		file_type = file_type.split(".")[1]
 		
+		# Valid MIDI file
 		if file_type == "mid":
-			valid = True
+			self.filename = filename
 
-		return valid
+			# Remove path, extension name, and capitalize
+			song_title = filename.split("/")[-1].split(".")[0]
+			song_title = song_title.replace("-", " ").replace("_", " ")
+			self.song_title = song_title.title()
+		# Invalid file
+		else:
+			self.song_title = "Invalid song type!"
 	
 	@property
 	def volume(self):

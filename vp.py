@@ -17,6 +17,8 @@ BLACK_PRESS = (75, 75, 75)
 LIGHT_GRAY  = (100, 100, 100)
 KEY_BORDER  = (200, 200, 200)
 
+GREEN       = (0,255,0)
+
 mixer.init()
 pygame.init()
 pygame.font.init()
@@ -36,6 +38,9 @@ pygame.display.set_caption('DigiPiano')
 total_keys = []
 clock = pygame.time.Clock()
 pygame.display.flip()
+
+# Notes in each octave
+Notes = [ "C", "C#","D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
 # Keybinds for 5 octaves --------------------------------------------------------------------------------------
 '''        C        C#    D     D#    E     F     F#    G     G#    A     A#     B '''				# Keybinds for piano
@@ -247,19 +252,27 @@ class Piano:
 	# Draw note labels and keybinds on piano
 	def draw_labels(self, i):
 		if self.note_toggle:
-			pass
+			if self.note_toggle:
+				if BLACKS[i % 12] == False:
+					label = pygame.font.Font(font,12).render(Notes[i % 12], True, BLACK)
+					label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 20)))
+					screen.blit(label, label_rect)
+					print(Notes[i % 12])
+				#Label black keys #TODO - key bindings appear, but are behind the black keys
+				else:
+					label = pygame.font.Font(font,12).render(Notes[i % 12], True, WHITE)
+					label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 20)))
+					screen.blit(label, label_rect)
 		
 		if self.keybind_toggle:
-			label = pygame.font.Font(font,12).render(self.order[i], True, BLACK)
-			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 10)))
-			screen.blit(label, label_rect)
-
+			#Label white keys
 			if BLACKS[i % 12] == False:
-				label = pygame.font.Font(font,8).render(self.order[i], True, BLACK)
+				label = pygame.font.Font(font,12).render(self.order[i], True, BLACK)
 				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 10)))
 				screen.blit(label, label_rect)
+			#Label black keys #TODO - key bindings appear, but are behind the black keys
 			else:
-				label = pygame.font.Font(font,8).render(self.order[i], True, WHITE)
+				label = pygame.font.Font(font,12).render(self.order[i], True, WHITE)
 				label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 10)))
 				screen.blit(label, label_rect)
 

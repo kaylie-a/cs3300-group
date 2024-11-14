@@ -26,6 +26,7 @@ pygame.font.init()
 # Constants
 SCREEN_WIDTH  = pygame.display.Info().current_w
 SCREEN_HEIGHT = pygame.display.Info().current_h
+SCALE = 0.12
 
 font = pygame.font.match_font('arial')
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT*0.93])
@@ -92,26 +93,71 @@ B_POSITION = [ 1,  3,  -1, 6,  8,  10, -1,
 
 # -------------------------------------------------------------------------------------------------------------
 
-# pygame.Rect( x_pos, y_pos, rect_width, rect_height )	==>	anchor point is top left
-# Left side menu
-freeplay_button = pygame.Rect(10, 10, 50, 50)
-learning_button = pygame.Rect(10, 70, 50, 50)
-note_label_toggle = pygame.Rect(10, 130, 50, 50)
-keybind_toggle = pygame.Rect(10, 190, 50, 50)
-transpose_up = pygame.Rect(10, 250, 50, 50)
-transpose_down = pygame.Rect(10, 310, 50, 50)
-info_button = pygame.Rect(10, 370, 50, 50)
+class Button():
+	def __init__(self, x, y, image, scale):
+		width = image.get_width()
+		height = image.get_height()
+		self.image = pygame.transform.scale(image, (int (width * scale), int (height * scale)))
+		self.rect = self.image.get_rect()
+		self.rect.topleft = (x, y)
 
-# Right side menu
-file_button = pygame.Rect(SCREEN_WIDTH - 430, 10, 50, 50)
-song_title_button = pygame.Rect(SCREEN_WIDTH - 370, 10, 360, 50)
-play_button = pygame.Rect(SCREEN_WIDTH - 60, 70, 50, 50)
-pause_button = pygame.Rect(SCREEN_WIDTH - 60, 130, 50, 50)
-slow_button = pygame.Rect(SCREEN_WIDTH - 60, 190, 50, 50)
-fast_button = pygame.Rect(SCREEN_WIDTH - 60, 250, 50, 50)
-metronome_button = pygame.Rect(SCREEN_WIDTH - 60, 310, 50, 50)
-inc_song_vol = pygame.Rect(SCREEN_WIDTH - 60, 370, 50, 50)
-low_song_vol = pygame.Rect(SCREEN_WIDTH - 60, 430, 50, 50)
+	def draw(self):
+		screen.blit(self.image, (self.rect.x, self.rect.y))
+
+
+# pygame.Rect( x_pos, y_pos, rect_width, rect_height )	==>	anchor point is top left
+# Left side menu -------------------------------------------------------------------------------------------------------------
+image = pygame.image.load("icons/fpm-icon.png").convert_alpha()
+freeplay_button = pygame.Rect(10, 10, 70, 70)
+freeplay_icon = Button(10, 10, image, SCALE)
+
+image = pygame.image.load("icons/lm-icon.png").convert_alpha()
+learning_button = pygame.Rect(10, 90, 70, 70)
+learning_icon = Button(10, 90, image, SCALE)
+
+image = pygame.image.load("icons/note-toggle-icon.png").convert_alpha()
+note_toggle = pygame.Rect(10, 170, 70, 70)
+note_icon = Button(10, 170, image, SCALE)
+
+image = pygame.image.load("icons/keybind-toggle-icon.png").convert_alpha()
+keybind_toggle = pygame.Rect(10, 250, 70, 70)
+keybind_icon = Button(10, 250, image, SCALE)
+
+image = pygame.image.load("icons/transpose-up-icon.png").convert_alpha()
+transpose_up = pygame.Rect(10, 330, 70, 70)
+transpose_up_icon = Button(10, 330, image, SCALE)
+
+image = pygame.image.load("icons/transpose-down-icon.png").convert_alpha()
+transpose_down = pygame.Rect(10, 410, 70, 70)
+transpose_down_icon = Button(10, 410, image, SCALE)
+
+image = pygame.image.load("icons/info-icon.png").convert_alpha()
+info_button = pygame.Rect(10, 490, 70, 70)
+info_icon = Button(10, 490, image, SCALE)
+
+
+# Right side menu ------------------------------------------------------------------------------------------------------------
+image = pygame.image.load("icons/file-icon.png").convert_alpha()
+file_button = pygame.Rect(SCREEN_WIDTH - 475, 10, 70, 70)
+file_icon = Button(SCREEN_WIDTH - 475, 10, image, SCALE)
+
+song_title_button = pygame.Rect(SCREEN_WIDTH - 390, 10, 380, 70)
+
+image = pygame.image.load("icons/play-icon.png").convert_alpha()
+play_button = pygame.Rect(SCREEN_WIDTH - 80, 90, 70, 70)
+play_icon = Button(SCREEN_WIDTH - 80, 90, image, SCALE)
+
+image = pygame.image.load("icons/pause-icon.png").convert_alpha()
+pause_button = pygame.Rect(SCREEN_WIDTH - 80, 170, 70, 70)
+pause_icon = Button(SCREEN_WIDTH - 80, 170, image, SCALE)
+
+image = pygame.image.load("icons/volume-up-icon.png").convert_alpha()
+inc_vol = pygame.Rect(SCREEN_WIDTH - 80, 250, 70, 70)
+inc_vol_icon = Button(SCREEN_WIDTH - 80, 250, image, SCALE)
+
+image = pygame.image.load("icons/volume-down-icon.png").convert_alpha()
+low_vol = pygame.Rect(SCREEN_WIDTH - 80, 330, 70, 70)
+low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
 welcome_screen = pygame.Rect((SCREEN_WIDTH / 2) - 400, SCREEN_HEIGHT / 2 - 250, 800, 500)
 
@@ -295,12 +341,12 @@ class Piano:
 			if skip_count == 7:
 				skip_count = 0
 
-	def menu_freeplay(self):		# implement 2 octave and 5 octave
+	def menu_freeplay(self):
 		self.total_key_num = 35
 		self.order    = OCT_5
 		self.semitone = 24
-		self.x_offset = 155
-		self.y_offset = 480
+		self.x_offset = 235
+		self.y_offset = (SCREEN_HEIGHT / 2) - 120
 		self.white_key_width  = 45
 		self.white_key_height = 200
 		self.black_key_width  = 27
@@ -314,8 +360,8 @@ class Piano:
 		self.total_key_num = 35
 		self.order    = OCT_5
 		self.semitone = 24
-		self.x_offset = 155
-		self.y_offset = 860
+		self.x_offset = 235
+		self.y_offset = SCREEN_HEIGHT - 320
 		self.white_key_width  = 45
 		self.white_key_height = 200
 		self.black_key_width  = 27
@@ -327,26 +373,34 @@ class Piano:
 
 	# Draws menu buttons
 	def draw_menu(self):
-		pygame.draw.rect(screen, (238, 137, 147), note_label_toggle)
+		pygame.draw.rect(screen, (238, 137, 147), note_toggle)
 		pygame.draw.rect(screen, (220, 87, 154), keybind_toggle)
-		pygame.draw.rect(screen, (145, 0, 255), freeplay_button)
+		pygame.draw.rect(screen, (0, 0, 0), freeplay_button)
 		pygame.draw.rect(screen, (240, 137, 247), learning_button)
 		pygame.draw.rect(screen, (106, 185, 114), transpose_up)
 		pygame.draw.rect(screen, (106, 185, 114), transpose_down)
 		pygame.draw.rect(screen, (124, 47, 129), info_button)
+		note_icon.draw()
+		keybind_icon.draw()
+		freeplay_icon.draw()
+		learning_icon.draw()
+		transpose_up_icon.draw()
+		transpose_down_icon.draw()
+		info_icon.draw()
 
 		if self.mode == True:
 			pygame.draw.rect(screen, (255, 255, 255), file_button)
 			pygame.draw.rect(screen, (255, 255, 255), song_title_button)
 			pygame.draw.rect(screen, (255, 255, 0), play_button)
 			pygame.draw.rect(screen, (255, 111, 0), pause_button)
-			pygame.draw.rect(screen, (0, 0, 255), slow_button)
-			pygame.draw.rect(screen, (255, 0, 0), fast_button)
-			pygame.draw.rect(screen, (0, 255, 255), metronome_button)
-			pygame.draw.rect(screen, (131, 145, 191), inc_song_vol)
-			pygame.draw.rect(screen, (131, 145, 191), low_song_vol)
-			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 25))
-		# implement button text/icon images
+			pygame.draw.rect(screen, (131, 145, 191), inc_vol)
+			pygame.draw.rect(screen, (131, 145, 191), low_vol)
+			file_icon.draw()
+			play_icon.draw()
+			pause_icon.draw()
+			inc_vol_icon.draw()
+			low_vol_icon.draw()
+			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))
 
 	# Run pygame and piano interface
 	def play_piano(self):
@@ -375,11 +429,11 @@ class Piano:
 						start = True
 						mixer.music.stop()
 
-					elif learning_button.collidepoint(mouse_pos):
+					if learning_button.collidepoint(mouse_pos):
 						self.menu_learning()
 						start = True
 
-					elif note_label_toggle.collidepoint(mouse_pos):
+					elif note_toggle.collidepoint(mouse_pos):
 						self.note_toggle = (not self.note_toggle)
 						self.draw_piano()
 
@@ -423,20 +477,11 @@ class Piano:
 						except Exception as e:
 							print(e)
 
-					elif slow_button.collidepoint(mouse_pos):
-						pass
-
-					elif fast_button.collidepoint(mouse_pos):
-						pass
-
-					elif metronome_button.collidepoint(mouse_pos):
-						pass
-
-					elif inc_song_vol.collidepoint(mouse_pos):
+					elif inc_vol.collidepoint(mouse_pos):
 						song_volume += 0.2
 						mixer.music.set_volume(song_volume)
 
-					elif low_song_vol.collidepoint(mouse_pos):
+					elif low_vol.collidepoint(mouse_pos):
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
 
@@ -475,4 +520,5 @@ class Piano:
 	def volume(self, value):
 		self.volume_value = value
 		fluidsynth.main_volume(self.channel, value)
+
 

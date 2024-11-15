@@ -1,5 +1,6 @@
 ## DigiPiano
-![alt text](https://github.com/kaylie-a/cs330-group/tree/main/icons/DigiPiano-icon.png?raw=true)
+![DigiPiano-icon](https://github.com/user-attachments/assets/e9ddcf1e-4d03-48e5-b9a1-59a913370a8e)
+
 
 DigiPiano is a digital resource used to help piano players of all levels practice and learn how to play on the go! The piano provides learning tools for players without experience in reading sheet music and helps pianists who learn better through visual representation of music.
 

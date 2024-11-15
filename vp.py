@@ -134,6 +134,9 @@ image = pygame.image.load("icons/info-icon.png").convert_alpha()
 info_button = pygame.Rect(10, 490, 70, 70)
 info_icon = Button(10, 490, image, SCALE)
 
+image = pygame.image.load("icons/info-tab.png").convert_alpha()
+info_tab = Button((SCREEN_WIDTH / 2) - 450, (SCREEN_HEIGHT / 2) - 500, image, 0.8)
+
 
 # Right side menu ------------------------------------------------------------------------------------------------------------
 image = pygame.image.load("icons/file-icon.png").convert_alpha()
@@ -158,13 +161,14 @@ image = pygame.image.load("icons/volume-down-icon.png").convert_alpha()
 low_vol = pygame.Rect(SCREEN_WIDTH - 80, 330, 70, 70)
 low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
-#Load Staff Image In
-staff_image = pygame.image.load("staffIMG.jpg").convert_alpha()
-staff_img = pygame.Rect(SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_WIDTH)
+# Load Staff Image In - temp
+image = pygame.image.load("icons/staffIMG.jpg").convert_alpha()
+staff_image = Button(200, 0, image, 0.9)
 
-welcome_screen = pygame.Rect((SCREEN_WIDTH / 2) - 400, SCREEN_HEIGHT / 2 - 250, 800, 500)
+image = pygame.image.load("icons/welcome-screen.png").convert_alpha()
+welcome_screen = Button((SCREEN_WIDTH / 2) - 400, (SCREEN_HEIGHT / 2) - 250, image, 0.65)
 
-# ----------------------------
+# -----------------------------------------------------------------------------------------------------------------------------
 
 class Piano:
 	def __init__(self, soundfont_path, transpose=0):
@@ -193,6 +197,7 @@ class Piano:
 		self.keybind_toggle_on = 0
 		self.note_toggle = False
 		self.note_toggle_on = 0
+		self.info_tab_on = False
 		
 		# Initialize and run piano
 		self.init()
@@ -228,7 +233,7 @@ class Piano:
 			
 			if callback.event_type == 'down': 
 				# If key is not pressed
-				if self.pressed_array[index] is False: 
+				if self.pressed_array[index] is False and self.info_tab_on == False: 
 					# Transpose the note index to start at lower octave
 					n = Note().from_int(index + self.semitone + self.transposition) 
 					fluidsynth.play_Note(n) 				# Play note
@@ -237,8 +242,9 @@ class Piano:
 					print(f"{callback.name} => {n}")
 			# UP event
 			else: 
-				self.pressed_array[index] = False 			# Key is released
-				self.release_key(index)						# Update GUI
+				if self.info_tab_on == False:
+					self.pressed_array[index] = False 			# Key is released
+					self.release_key(index)						# Update GUI
 
 		except Exception as e:
 			print(e)
@@ -392,9 +398,7 @@ class Piano:
 
 		screen.fill(LIGHT_GRAY)
 		self.draw_white_keys()
-
-		screen.blit(staff_image, (SCREEN_WIDTH - 1450, SCREEN_HEIGHT - 750))
-
+		
 
 	# Draws menu buttons
 	def draw_menu(self):
@@ -427,12 +431,17 @@ class Piano:
 			low_vol_icon.draw()
 			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))
 
+			if self.info_tab_on == False:
+				staff_image.draw()
+
 	# Run pygame and piano interface
 	def play_piano(self):
 		run = True
 		start = False
 		paused = False
 		song_volume = 2
+
+		welcome_screen.draw()
 
 		while run:
 			for event in pygame.event.get():
@@ -448,47 +457,55 @@ class Piano:
 
 					# Check which button is pressed
 					# Left side menu --------------------------------------------------------------------------------------------------------
+
 					if freeplay_button.collidepoint(mouse_pos):
 						
 						self.menu_freeplay()
 						start = True
 						mixer.music.stop()
+						self.info_tab_on = False
 
 					if learning_button.collidepoint(mouse_pos):
 						
 						self.menu_learning()
 						start = True
+						self.info_tab_on = False
 
 					elif keybind_toggle.collidepoint(mouse_pos):
 						
-						self.keybind_toggle = (not self.keybind_toggle)
-						self.draw_white_keys()
-						if self.keybind_toggle == True:
-							self.keybind_toggle_on += 1
-						else:
-							screen.fill(LIGHT_GRAY)
+						if start == True:
+							self.keybind_toggle = (not self.keybind_toggle)
 							self.draw_white_keys()
-							self.keybind_toggle_on = 0
-							if self.note_toggle == True:
+							if self.keybind_toggle == True:
+								self.keybind_toggle_on += 1
+							else:
+								screen.fill(LIGHT_GRAY)
 								self.draw_white_keys()
+								self.keybind_toggle_on = 0
+								if self.note_toggle == True:
+									self.draw_white_keys()
 
 					elif note_toggle.collidepoint(mouse_pos):
 						
-						self.note_toggle = (not self.note_toggle)
-						self.draw_white_keys()
-						if self.note_toggle == True:
-							self.note_toggle_on += 1
-						else:
-							screen.fill(LIGHT_GRAY)
+						if start == True:
+							self.note_toggle = (not self.note_toggle)
 							self.draw_white_keys()
-							self.note_toggle_on = 0
-							if self.keybind_toggle == True:
+							if self.note_toggle == True:
+								self.note_toggle_on += 1
+							else:
+								screen.fill(LIGHT_GRAY)
 								self.draw_white_keys()
+								self.note_toggle_on = 0
+								if self.keybind_toggle == True:
+									self.draw_white_keys()
 
 					elif file_button.collidepoint(mouse_pos):
-						#Open file select
-						filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:", filetypes=[("MIDI files", "*.mid")])
-						self.test_MIDI(filename)
+						# Open file select
+						try:
+							filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:", filetypes=[("MIDI files", "*.mid")])
+							self.test_MIDI(filename)
+						except Exception as e:
+							print(e)
 
 					elif transpose_up.collidepoint(mouse_pos):
 						self.semitone += 1
@@ -497,7 +514,18 @@ class Piano:
 						self.semitone -= 1
 
 					elif info_button.collidepoint(mouse_pos):
-						pass
+						self.info_tab_on = (not self.info_tab_on)
+
+						if self.info_tab_on == True:
+							info_tab.draw()
+							# TODO: disable piano playing
+						else:
+							screen.fill(LIGHT_GRAY)
+
+							if start == False:
+								welcome_screen.draw()
+							else:
+								self.draw_white_keys()
 
 	
 
@@ -531,9 +559,6 @@ class Piano:
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
 
-			if start == False:
-				pygame.draw.rect(screen, WHITE, welcome_screen)
-			
 			# Update the screen
 			self.draw_menu()
 			pygame.display.update()

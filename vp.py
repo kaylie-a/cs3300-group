@@ -158,6 +158,10 @@ image = pygame.image.load("icons/volume-down-icon.png").convert_alpha()
 low_vol = pygame.Rect(SCREEN_WIDTH - 80, 330, 70, 70)
 low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
+#Load Staff Image In
+staff_image = pygame.image.load("staffIMG.jpg").convert_alpha()
+staff_img = pygame.Rect(SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_WIDTH)
+
 welcome_screen = pygame.Rect((SCREEN_WIDTH / 2) - 400, SCREEN_HEIGHT / 2 - 250, 800, 500)
 
 # ----------------------------
@@ -193,6 +197,8 @@ class Piano:
 		# Initialize and run piano
 		self.init()
 		self.play_piano()
+
+		
 
 	def init(self):
 		fluidsynth.init(self.soundfont_path)
@@ -365,6 +371,7 @@ class Piano:
 		screen.fill(LIGHT_GRAY)
 		self.draw_white_keys()
 
+	
 	def menu_learning(self):
 		self.total_key_num = 35
 		self.order    = order
@@ -385,6 +392,9 @@ class Piano:
 
 		screen.fill(LIGHT_GRAY)
 		self.draw_white_keys()
+
+		screen.blit(staff_image, (SCREEN_WIDTH - 1450, SCREEN_HEIGHT - 750))
+
 
 	# Draws menu buttons
 	def draw_menu(self):
@@ -439,15 +449,18 @@ class Piano:
 					# Check which button is pressed
 					# Left side menu --------------------------------------------------------------------------------------------------------
 					if freeplay_button.collidepoint(mouse_pos):
+						
 						self.menu_freeplay()
 						start = True
 						mixer.music.stop()
 
 					if learning_button.collidepoint(mouse_pos):
+						
 						self.menu_learning()
 						start = True
 
 					elif keybind_toggle.collidepoint(mouse_pos):
+						
 						self.keybind_toggle = (not self.keybind_toggle)
 						self.draw_white_keys()
 						if self.keybind_toggle == True:
@@ -460,6 +473,7 @@ class Piano:
 								self.draw_white_keys()
 
 					elif note_toggle.collidepoint(mouse_pos):
+						
 						self.note_toggle = (not self.note_toggle)
 						self.draw_white_keys()
 						if self.note_toggle == True:
@@ -484,6 +498,8 @@ class Piano:
 
 					elif info_button.collidepoint(mouse_pos):
 						pass
+
+	
 
 					# Right side menu -------------------------------------------------------------------------------------------------------
 

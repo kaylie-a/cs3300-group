@@ -41,7 +41,7 @@ clock = pygame.time.Clock()
 pygame.display.flip()
 
 white_notes = [ "C",  "D",  "E",  "F", "G",  "A",  "B" ]
-black_notes = [ "C#", "D#", " ",  "F#" "G#", "A#", " " ]
+black_notes = [ "C#", "D#", "F#", "G#", "A#"]
 
 white_order = [ "esc", "f2", "f4", "f5", "f7", "f9", "f11",
 			    "1",   "3",  "5",  "6",  "8",  "0",  "=",
@@ -338,10 +338,10 @@ class Piano:
 			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 215)))			# - 15
 			screen.blit(label, label_rect)
 
-			# Label black keys: 5 black keys per octave				 TODO - key bindings appear, but incorrect spacing
+			# Label black keys: 5 black keys per octave
 			if black_key == True:
 				label = pygame.font.Font(font,12).render(black_order[i], True, GREEN)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height - 165)))		# - 10
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height - 165)))		# - 10
 				screen.blit(label, label_rect)
 
 		if self.note_toggle:
@@ -353,8 +353,8 @@ class Piano:
 			# Label black keys: 5 black keys per octave				 TODO - key bindings appear, but incorrect spacing
 			if black_key == True:
 				label = pygame.font.Font(font,12).render(black_notes[i % 5], True, GREEN)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.black_key_width) + self.black_key_width // 2, (self.y_offset + self.black_key_height + 110)))		# - 30
-				screen.blit(label, label_rect)		
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height + 110)))		# - 30
+				screen.blit(label, label_rect)
 
 	def menu_freeplay(self):
 		self.total_key_num = 35

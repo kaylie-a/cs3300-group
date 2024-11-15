@@ -11,7 +11,7 @@ FPS = 60
 
 # Colors
 WHITE       = (255, 255, 255)
-WHITE_PRESS = (200, 200, 200)
+WHITE_PRESS = (220, 220, 220)
 BLACK       = (0, 0, 0)
 BLACK_PRESS = (75, 75, 75)
 LIGHT_GRAY  = (100, 100, 100)
@@ -254,9 +254,9 @@ class Piano:
 		# White key
 		if BLACKS[index % 12] == False:
 			i = W_POSITION.index(index)
-			total_keys[index] = pygame.draw.rect(screen, WHITE_PRESS, (self.x_offset + i * self.white_key_width, 
+			total_keys[index] = pygame.draw.rect(screen, WHITE_PRESS, (self.x_offset + i * self.white_key_width + 1, 	# Printing doesn't overlap border
 															  		   self.y_offset, 
-																	   self.white_key_width, 
+																	   self.white_key_width - 2, 
 																	   self.white_key_height))			
 			self.draw_black_keys()
 		# Black key

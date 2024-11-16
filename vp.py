@@ -173,7 +173,7 @@ low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
 # Load Staff Image In - temp
 image = pygame.image.load("icons/staffIMG.jpg").convert_alpha()
-staff_image = Button(200, 0, image, 0.9)
+staff_image = Button(200, 0, image, 1920/SCREEN_WIDTH)
 
 image = pygame.image.load("icons/welcome-screen.png").convert_alpha()
 welcome_screen = Button((SCREEN_WIDTH / 2) - 400, (SCREEN_HEIGHT / 2) - 250, image, 0.65)
@@ -526,7 +526,7 @@ class Piano:
 
 						# Open file select
 						try:
-							filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:", filetypes=[("MIDI files", "*.mid")])
+							filename = filedialog.askopenfilename(initialdir="/songs", title="Select file:", filetypes=[("MIDI files", "*.mid")])
 							self.test_MIDI(filename)
 						except Exception as e:
 							print(e)

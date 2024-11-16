@@ -42,6 +42,7 @@ total_keys = []
 clock = pygame.time.Clock()
 pygame.display.flip()
 
+# Names for note label printing
 white_notes_full = [ "C1", "D1", "E1", "F1", "G1", "A1", "B1",
 					 "C2", "D2", "E2", "F2", "G2", "A2", "B2",
 					 "C3", "D3", "E3", "F3", "G3", "A3", "B3",
@@ -54,6 +55,7 @@ black_notes_full = [ "C#1", "D#1", " ",  "F#1", "G#1", "A#1", " ",
 					 "C#4", "D#4", " ",  "F#4", "G#4", "A#4", " ",
 					 "C#5", "D#5", " ",  "F#5", "G#5", "A#5", " " ]
 
+# Names for keybind label printing
 white_order = [ "esc", "f2", "f4", "f5", "f7", "f9", "f11",
 			    "1",   "3",  "5",  "6",  "8",  "0",  "=",
 				"q",   "e",  "t",  "y",  "i",  "p",  "]",
@@ -73,15 +75,6 @@ order = [ "esc",   "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", 
 	      "q",     "w",  "e",  "r",  "t",  "y",  "u",  "i",  "o",  "p",  "[",   "]", 				# Octave 3
 	      "a",     "s",  "d",  "f",  "g",  "h",  "j",  "k",  "l",  ";",  "'",   "enter", 			# Octave 4
 		  "shift", "z",  "x",  "c",  "v",  "b",  "n",  "m",  ",",  ".",  "/",   "right shift" ]		# Octave 5
-'''TOTAL_KEYS_5    = 35			# Total white keys
-SEMITONE_5      = 24			# Pitch shift
-X_OFFSET_5      = 155
-Y_OFFSET_FPM_5  = 480			# Center
-Y_OFFSET_LM_5   = 860			# Bottom
-WHITE_KEY_WIDTH_5  = 45
-WHITE_KEY_HEIGHT_5 = 200
-BLACK_KEY_WIDTH_5  = 27
-BLACK_KEY_HEIGHT_5 = 125'''
 
 # Indicates which are black keys (True) -----------------------------------------------------------------------
 BLACKS = [ False, True, False, True, False, False, True, False, True, False, True, False ]
@@ -193,7 +186,6 @@ class Piano:
 		self.semitone = 24
 		self.channel = 0
 		self.volume_value = 128
-		self.sustain = False
 		self.mode = False			# Freeplay Mode: False, Learning Mode: True
 
 		self.total_key_num = 0
@@ -222,15 +214,6 @@ class Piano:
 		fluidsynth.init(self.soundfont_path)
 		keyboard.hook(self.key)
 
-		if self.sustain:
-			fluidsynth.control_change(0, 64, 127)
-			fluidsynth.control_change(0, 91, 127)
-			print("Sustain: ON")
-		else:
-			fluidsynth.control_change(0, 64, 0)
-			fluidsynth.control_change(0, 91, 0)
-			print("Sustain: OFF")
-
 		# Startup sound: Plays note in each octave
 		for octave in range(9):
 			fluidsynth.play_Note(Note("C", octave))
@@ -243,16 +226,16 @@ class Piano:
 		# Keyboard event UP:   Set the key to released
 		try:
 			index = self.order.index(callback.name)
-			# DOWN event
 			
+			# DOWN event
 			if callback.event_type == 'down': 
 				# If key is not pressed
 				if self.pressed_array[index] is False and self.info_tab_on == False: 
 					# Transpose the note index to start at lower octave
 					n = Note().from_int(index + self.semitone + self.transposition) 
-					fluidsynth.play_Note(n) 				# Play note
-					self.pressed_array[index] = True 		# The key is now pressed
-					self.press_key(index)					# Update GUI
+					fluidsynth.play_Note(n) 					# Play note
+					self.pressed_array[index] = True 			# The key is now pressed
+					self.press_key(index)						# Update GUI
 					print(f"{callback.name} => {n}")
 			# UP event
 			else: 
@@ -306,7 +289,7 @@ class Piano:
 		pygame.display.update()
 
 
-	# Draw the keys
+	# Draw white keys on piano
 	def draw_white_keys(self):
     	# Draw white keys and border
 		for i in range(self.total_key_num):
@@ -327,7 +310,7 @@ class Piano:
 		pygame.display.flip()
 
 
-	# Separate function for only black keys - highlight on white keys doesn't cover black keys
+	# Separate function for drawing black keys - highlight on white keys doesn't cover black keys
 	def draw_black_keys(self):
 		skip_count = 0
 
@@ -355,27 +338,32 @@ class Piano:
 		if self.keybind_toggle:
 			# Label white keys: 7 white keys per octave
 			label = pygame.font.Font(font,16).render(white_order[i], True, BLACK)
-			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 210)))
+			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
+												(self.y_offset + self.white_key_height - 210)))
 			screen.blit(label, label_rect)
 
 			# Label black keys: 5 black keys per octave
 			if black_key == True:
 				label = pygame.font.Font(font,16).render(black_order[i], True, BLACK)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height - 150)))
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, 
+													(self.y_offset + self.black_key_height - 150)))
 				screen.blit(label, label_rect)
 
 		if self.note_toggle:
 			label = pygame.font.Font(font,16).render(white_notes_full[i], True, BLACK)
-			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height + 15)))
+			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
+												(self.y_offset + self.white_key_height + 15)))
 			screen.blit(label, label_rect)
 
 			# Label black keys: 5 black keys per octave
 			if black_key == True:
 				label = pygame.font.Font(font,16).render(black_notes_full[i], True, BLACK)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height + 110)))
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, 
+													(self.y_offset + self.black_key_height + 110)))
 				screen.blit(label, label_rect)
 
 
+	# Initializes piano in Freeplay mode
 	def menu_freeplay(self):
 		self.total_key_num 	= 35
 		self.order    		= order
@@ -398,6 +386,7 @@ class Piano:
 		self.draw_white_keys()
 
 	
+	# Initializes piano in Learning mode
 	def menu_learning(self):
 		self.total_key_num = 35
 		self.order    = order
@@ -459,7 +448,6 @@ class Piano:
 	def play_piano(self):
 		run = True
 		start = False
-		paused = False
 		song_volume = 2
 
 		welcome_screen.draw()
@@ -561,12 +549,7 @@ class Piano:
 						try:
 							mixer.music.load(self.filename)
 							mixer.music.set_volume(song_volume)
-
-							#if paused == False:				temp: TODO
 							mixer.music.play()
-							#else:
-							#	print("unpause")
-							#	mixer.music.unpause()
 								
 						except Exception as e:
 							print(e)

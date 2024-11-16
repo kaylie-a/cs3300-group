@@ -174,7 +174,7 @@ low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
 # Load Staff Image In - temp
 image = pygame.image.load("icons/staffIMG.jpg").convert_alpha()
-staff_image = Button(200, 0, image, 1920/SCREEN_WIDTH)
+staff_image = Button(200, 0, image, SCREEN_WIDTH/1920 - 0.1)
 
 image = pygame.image.load("icons/welcome-screen.png").convert_alpha()
 welcome_screen = Button((SCREEN_WIDTH / 2) - 400, (SCREEN_HEIGHT / 2) - 250, image, 0.65)

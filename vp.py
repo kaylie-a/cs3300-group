@@ -6,6 +6,7 @@ from mingus.midi import fluidsynth
 from mingus.containers.note import Note 
 from sys import exit
 from tkinter import filedialog
+from mido import MidiFile
 
 FPS = 60
 
@@ -332,7 +333,7 @@ class Piano:
     	# Draw black keys in the appropriate positions
 		for i in range(self.total_key_num):
 			# Skip keys for E and B
-			if skip_count != 2 and skip_count != 6:
+			if skip_count not in [2, 6]:
 				pygame.draw.rect(screen, BLACK, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, 
 									 			 self.y_offset, 
 												 self.black_key_width, 

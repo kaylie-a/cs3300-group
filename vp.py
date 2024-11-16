@@ -476,9 +476,15 @@ class Piano:
 
 					if freeplay_button.collidepoint(mouse_pos):
 						
+						'''
+							Draw freeplay mode 
+							stop music when exiting
+							Piano and some button functionalities enabled after starting piano
+							Reset showing info tab
+						'''
 						self.menu_freeplay()
-						start = True
 						mixer.music.stop()
+						start = True
 						self.info_tab_on = False
 
 					if learning_button.collidepoint(mouse_pos):
@@ -529,10 +535,12 @@ class Piano:
 							print(e)
 
 					elif transpose_up.collidepoint(mouse_pos):
-						self.semitone += 1
+						if start == True:
+							self.semitone += 1
 
 					elif transpose_down.collidepoint(mouse_pos):
-						self.semitone -= 1
+						if start == True:
+							self.semitone -= 1
 
 					elif info_button.collidepoint(mouse_pos):
 						self.info_tab_on = (not self.info_tab_on)
@@ -606,13 +614,3 @@ class Piano:
 		# Invalid file
 		else:
 			self.song_title = "Invalid song type!"
-	
-
-	@property
-	def volume(self):
-		return self.volume_value
-
-	@volume.setter
-	def volume(self, value):
-		self.volume_value = value
-		fluidsynth.main_volume(self.channel, value)

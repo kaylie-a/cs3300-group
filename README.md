@@ -7,7 +7,11 @@ DigiPiano is a digital resource used to help piano players of all levels practic
 ## Installation
 Works through an executable file on desktop computers only.
 
-## Soundfonts
+```
+git clone https://github.com/kaylie-a/cs3300-group.git
+```
+
+**Soundfonts**
 Download .sf2 file for piano audio: https://drive.google.com/file/d/1VZkoiVOonffpJWxZah-AdQkxaTFIzZ6q/view
 Place file in soundfonts folder for the piano keys' audio.
 

@@ -411,13 +411,16 @@ class Piano:
 
 	# Draws menu buttons
 	def draw_menu(self):
-		pygame.draw.rect(screen, (220, 87, 154), keybind_toggle)
-		pygame.draw.rect(screen, (238, 137, 147), note_toggle)		
-		pygame.draw.rect(screen, (0, 0, 0), freeplay_button)
-		pygame.draw.rect(screen, (240, 137, 247), learning_button)
-		pygame.draw.rect(screen, (106, 185, 114), transpose_up)
-		pygame.draw.rect(screen, (106, 185, 114), transpose_down)
-		pygame.draw.rect(screen, (124, 47, 129), info_button)
+		# Draw left side buttons
+		pygame.draw.rect(screen, BLACK, keybind_toggle)
+		pygame.draw.rect(screen, BLACK, note_toggle)		
+		pygame.draw.rect(screen, BLACK, freeplay_button)
+		pygame.draw.rect(screen, BLACK, learning_button)
+		pygame.draw.rect(screen, BLACK, transpose_up)
+		pygame.draw.rect(screen, BLACK, transpose_down)
+		pygame.draw.rect(screen, BLACK, info_button)
+
+		# Draw left side icons
 		keybind_icon.draw()
 		note_icon.draw()
 		freeplay_icon.draw()
@@ -426,13 +429,17 @@ class Piano:
 		transpose_down_icon.draw()
 		info_icon.draw()
 
+		# Learning mode buttons
 		if self.mode == True:
-			pygame.draw.rect(screen, (255, 255, 255), file_button)
-			pygame.draw.rect(screen, (255, 255, 255), song_title_button)
-			pygame.draw.rect(screen, (255, 255, 0), play_button)
-			pygame.draw.rect(screen, (255, 111, 0), pause_button)
-			pygame.draw.rect(screen, (131, 145, 191), inc_vol)
-			pygame.draw.rect(screen, (131, 145, 191), low_vol)
+			# Draw right side buttons
+			pygame.draw.rect(screen, BLACK, file_button)
+			pygame.draw.rect(screen, WHITE, song_title_button)
+			pygame.draw.rect(screen, BLACK, play_button)
+			pygame.draw.rect(screen, BLACK, pause_button)
+			pygame.draw.rect(screen, BLACK, inc_vol)
+			pygame.draw.rect(screen, BLACK, low_vol)
+			
+			# Draw right side icons
 			file_icon.draw()
 			play_icon.draw()
 			pause_icon.draw()
@@ -469,9 +476,15 @@ class Piano:
 
 					if freeplay_button.collidepoint(mouse_pos):
 						
+						'''
+							Draw freeplay mode 
+							stop music when exiting
+							Piano and some button functionalities enabled after starting piano
+							Reset showing info tab
+						'''
 						self.menu_freeplay()
-						start = True
 						mixer.music.stop()
+						start = True
 						self.info_tab_on = False
 
 					if learning_button.collidepoint(mouse_pos):
@@ -522,10 +535,12 @@ class Piano:
 							print(e)
 
 					elif transpose_up.collidepoint(mouse_pos):
-						self.semitone += 1
+						if start == True:
+							self.semitone += 1
 
 					elif transpose_down.collidepoint(mouse_pos):
-						self.semitone -= 1
+						if start == True:
+							self.semitone -= 1
 
 					elif info_button.collidepoint(mouse_pos):
 						self.info_tab_on = (not self.info_tab_on)
@@ -599,13 +614,3 @@ class Piano:
 		# Invalid file
 		else:
 			self.song_title = "Invalid song type!"
-	
-
-	@property
-	def volume(self):
-		return self.volume_value
-
-	@volume.setter
-	def volume(self, value):
-		self.volume_value = value
-		fluidsynth.main_volume(self.channel, value)

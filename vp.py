@@ -350,18 +350,18 @@ class Piano:
 			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height + 15)))			# - 35
 			screen.blit(label, label_rect)
 
-			# Label black keys: 5 black keys per octave				 TODO - key bindings appear, but incorrect spacing
+			# Label black keys: 5 black keys per octave
 			if black_key == True:
 				label = pygame.font.Font(font,12).render(black_notes[i % 7], True, GREEN)
 				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height + 110)))		# - 30
 				screen.blit(label, label_rect)
 
 	def menu_freeplay(self):
-		self.total_key_num = 35
-		self.order    = order
-		self.semitone = 24
-		self.x_offset = 235
-		self.y_offset = (SCREEN_HEIGHT / 2) - 120
+		self.total_key_num 	= 35
+		self.order    		= order
+		self.semitone 		= 24
+		self.x_offset 		= 235
+		self.y_offset 		= (SCREEN_HEIGHT / 2) - 120
 		self.white_key_width  = 45
 		self.white_key_height = 200
 		self.black_key_width  = 27

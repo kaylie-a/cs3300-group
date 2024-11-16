@@ -6,7 +6,7 @@ from mingus.midi import fluidsynth
 from mingus.containers.note import Note 
 from sys import exit
 from tkinter import filedialog
-from mido import MidiFile
+
 
 FPS = 60
 

@@ -16,6 +16,8 @@ git clone https://github.com/kaylie-a/cs3300-group.git
 Download .sf2 file for piano audio: https://drive.google.com/file/d/1VZkoiVOonffpJWxZah-AdQkxaTFIzZ6q/view
 Place file in a folder called "soundfonts" for the piano keys' audio.
 
+Run the piano through the ```executable.bat``` file.
+
 ## MIDI files
 DigiPiano's Learning mode uses MIDI song files to play alongside the piano. Directory folders "melodies" and "songs" contain free files to use in the program.
 Custom and other MIDI files from the user can also be used. Download more songs from [BitMidi](https://bitmidi.com/) - Open Source MIT https://github.com/feross/timidity?tab=MIT-1-ov-file

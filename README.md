@@ -1,4 +1,4 @@
-### **DigiPiano**
+## DigiPiano
 ![DigiPiano-icon](https://github.com/user-attachments/assets/e9ddcf1e-4d03-48e5-b9a1-59a913370a8e)
 
 

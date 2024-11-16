@@ -16,7 +16,7 @@ BLACK       = (0, 0, 0)
 BLACK_PRESS = (75, 75, 75)
 LIGHT_GRAY  = (100, 100, 100)
 KEY_BORDER  = (200, 200, 200)
-
+# Test color
 GREEN       = (0,255,0)
 
 mixer.init()
@@ -40,14 +40,24 @@ total_keys = []
 clock = pygame.time.Clock()
 pygame.display.flip()
 
-white_notes = [ "C",  "D",  "E",  "F", "G",  "A",  "B" ]
-black_notes = [ "C#", "D#", " ",  "F#", "G#", "A#", " "]
+white_notes_full = [ "C1", "D1", "E1", "F1", "G1", "A1", "B1",
+					 "C2", "D2", "E2", "F2", "G2", "A2", "B2",
+					 "C3", "D3", "E3", "F3", "G3", "A3", "B3",
+					 "C4", "D4", "E4", "F4", "G4", "A4", "B4",
+					 "C5", "D5", "E5", "F5", "G5", "A5", "B5" ]
+
+black_notes_full = [ "C#1", "D#1", " ",  "F#1", "G#1", "A#1", " ",
+					 "C#2", "D#2", " ",  "F#2", "G#2", "A#2", " ",
+					 "C#3", "D#3", " ",  "F#3", "G#3", "A#3", " ",
+					 "C#4", "D#4", " ",  "F#4", "G#4", "A#4", " ",
+					 "C#5", "D#5", " ",  "F#5", "G#5", "A#5", " " ]
 
 white_order = [ "esc", "f2", "f4", "f5", "f7", "f9", "f11",
 			    "1",   "3",  "5",  "6",  "8",  "0",  "=",
 				"q",   "e",  "t",  "y",  "i",  "p",  "]",
 				"a",   "d",  "g",  "h",  "k",  ";",  "ret",
 				"sh",  "x",  "v",  "b",  "m",  ".",  "rsh" ]
+
 black_order = [ "f1", "f3", " ", "f6", "f8", "f10", " ",
 			    "2",  "4",  " ", "7",  "9",  "-",  " ",
 				"w",  "r",  " ", "u",  "o",  "[",  " ",
@@ -168,7 +178,9 @@ staff_image = Button(200, 0, image, 0.9)
 image = pygame.image.load("icons/welcome-screen.png").convert_alpha()
 welcome_screen = Button((SCREEN_WIDTH / 2) - 400, (SCREEN_HEIGHT / 2) - 250, image, 0.65)
 
+
 # -----------------------------------------------------------------------------------------------------------------------------
+
 
 class Piano:
 	def __init__(self, soundfont_path, transpose=0):
@@ -203,7 +215,6 @@ class Piano:
 		self.init()
 		self.play_piano()
 
-		
 
 	def init(self):
 		fluidsynth.init(self.soundfont_path)
@@ -222,6 +233,7 @@ class Piano:
 		for octave in range(9):
 			fluidsynth.play_Note(Note("C", octave))
 			time.sleep(0.1)
+
 
 	# Piano reacts on keyboard press based on the order of keybinds
 	def key(self, callback):
@@ -249,6 +261,7 @@ class Piano:
 		except Exception as e:
 			print(e)
 
+
 	# Updates GUI, shows on piano when a key is pressed
 	def press_key(self, index):
 		# White key
@@ -268,6 +281,7 @@ class Piano:
 																	   self.black_key_height))
 			
 		pygame.display.update()
+
 
 	# Updates GUI, shows on piano when a key is released
 	def release_key(self, index):
@@ -289,6 +303,7 @@ class Piano:
 		self.draw_white_keys()
 		pygame.display.update()
 
+
 	# Draw the keys
 	def draw_white_keys(self):
     	# Draw white keys and border
@@ -309,6 +324,7 @@ class Piano:
 		self.draw_black_keys()
 		pygame.display.flip()
 
+
 	# Separate function for only black keys - highlight on white keys doesn't cover black keys
 	def draw_black_keys(self):
 		skip_count = 0
@@ -321,6 +337,7 @@ class Piano:
 									 			 self.y_offset, 
 												 self.black_key_width, 
 												 self.black_key_height))
+												 
 			if self.keybind_toggle_on == 0 or self.note_toggle_on == 0 :
 				self.draw_labels(i, True)
 
@@ -330,31 +347,32 @@ class Piano:
 			if skip_count == 7:
 				skip_count = 0
 			
+
 	# Draw keybind and note labels on piano
 	def draw_labels(self, i, black_key):
 		if self.keybind_toggle:
 			# Label white keys: 7 white keys per octave
 			label = pygame.font.Font(font,16).render(white_order[i], True, BLACK)
-			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 215)))			# - 15
+			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height - 210)))
 			screen.blit(label, label_rect)
 
 			# Label black keys: 5 black keys per octave
 			if black_key == True:
-				label = pygame.font.Font(font,12).render(black_order[i], True, GREEN)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height - 165)))		# - 10
+				label = pygame.font.Font(font,16).render(black_order[i], True, BLACK)
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height - 150)))
 				screen.blit(label, label_rect)
 
 		if self.note_toggle:
-			# Label white keys: 7 white keys per octave
-			label = pygame.font.Font(font,16).render(white_notes[i % 7], True, BLACK)
-			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height + 15)))			# - 35
+			label = pygame.font.Font(font,16).render(white_notes_full[i], True, BLACK)
+			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, (self.y_offset + self.white_key_height + 15)))
 			screen.blit(label, label_rect)
 
 			# Label black keys: 5 black keys per octave
 			if black_key == True:
-				label = pygame.font.Font(font,12).render(black_notes[i % 7], True, GREEN)
-				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height + 110)))		# - 30
+				label = pygame.font.Font(font,16).render(black_notes_full[i], True, BLACK)
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, (self.y_offset + self.black_key_height + 110)))
 				screen.blit(label, label_rect)
+
 
 	def menu_freeplay(self):
 		self.total_key_num 	= 35
@@ -434,6 +452,7 @@ class Piano:
 			if self.info_tab_on == False:
 				staff_image.draw()
 
+
 	# Run pygame and piano interface
 	def play_piano(self):
 		run = True
@@ -453,10 +472,10 @@ class Piano:
 				# 3 states: MOUSEBUTTONDOWN, MOUSEBUTTONUP, or MOUSEMOTION
 				# event.button == 1: left mouse button
 				if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-					mouse_pos = event.pos
-
+					
 					# Check which button is pressed
 					# Left side menu --------------------------------------------------------------------------------------------------------
+					mouse_pos = event.pos
 
 					if freeplay_button.collidepoint(mouse_pos):
 						
@@ -476,12 +495,14 @@ class Piano:
 						if start == True:
 							self.keybind_toggle = (not self.keybind_toggle)
 							self.draw_white_keys()
+
 							if self.keybind_toggle == True:
 								self.keybind_toggle_on += 1
 							else:
 								screen.fill(LIGHT_GRAY)
 								self.draw_white_keys()
 								self.keybind_toggle_on = 0
+
 								if self.note_toggle == True:
 									self.draw_white_keys()
 
@@ -490,16 +511,19 @@ class Piano:
 						if start == True:
 							self.note_toggle = (not self.note_toggle)
 							self.draw_white_keys()
+
 							if self.note_toggle == True:
 								self.note_toggle_on += 1
 							else:
 								screen.fill(LIGHT_GRAY)
 								self.draw_white_keys()
 								self.note_toggle_on = 0
+
 								if self.keybind_toggle == True:
 									self.draw_white_keys()
 
 					elif file_button.collidepoint(mouse_pos):
+
 						# Open file select
 						try:
 							filename = filedialog.askopenfilename(initialdir="C:/", title="Select file:", filetypes=[("MIDI files", "*.mid")])
@@ -518,7 +542,6 @@ class Piano:
 
 						if self.info_tab_on == True:
 							info_tab.draw()
-							# TODO: disable piano playing
 						else:
 							screen.fill(LIGHT_GRAY)
 
@@ -532,30 +555,37 @@ class Piano:
 					# Right side menu -------------------------------------------------------------------------------------------------------
 
 					elif play_button.collidepoint(mouse_pos):
+
 						try:
 							mixer.music.load(self.filename)
 							mixer.music.set_volume(song_volume)
-							if paused == False:
-								mixer.music.play()
-							else:
-								print("unpause")				# TODO
-								mixer.music.unpause()
+
+							#if paused == False:				temp: TODO
+							mixer.music.play()
+							#else:
+							#	print("unpause")
+							#	mixer.music.unpause()
+								
 						except Exception as e:
 							print(e)
 							self.song_title = "No MIDI file found!"
 
 					elif pause_button.collidepoint(mouse_pos):
+
 						try:
 							mixer.music.pause()
-							paused = True	
+							paused = True
+
 						except Exception as e:
 							print(e)
 
 					elif inc_vol.collidepoint(mouse_pos):
+
 						song_volume += 0.2
 						mixer.music.set_volume(song_volume)
 
 					elif low_vol.collidepoint(mouse_pos):
+
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
 
@@ -564,8 +594,10 @@ class Piano:
 			pygame.display.update()
 			clock.tick(FPS)
 
+
 	# Tests if MIDI file is valid
 	def test_MIDI(self, filename):
+
 		# Separate file extension name
 		file_type = filename.split("/")
 		file_type = file_type[len(file_type) - 1]
@@ -583,6 +615,7 @@ class Piano:
 		else:
 			self.song_title = "Invalid song type!"
 	
+
 	@property
 	def volume(self):
 		return self.volume_value
@@ -591,5 +624,3 @@ class Piano:
 	def volume(self, value):
 		self.volume_value = value
 		fluidsynth.main_volume(self.channel, value)
-
-

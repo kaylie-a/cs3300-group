@@ -431,6 +431,9 @@ class Piano:
 
 		# Learning mode buttons
 		if self.mode == True:
+			if self.info_tab_on == False:
+				staff_image.draw()
+
 			# Draw right side buttons
 			pygame.draw.rect(screen, BLACK, file_button)
 			pygame.draw.rect(screen, WHITE, song_title_button)
@@ -446,9 +449,6 @@ class Piano:
 			inc_vol_icon.draw()
 			low_vol_icon.draw()
 			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))
-
-			if self.info_tab_on == False:
-				staff_image.draw()
 
 
 	# Run pygame and piano interface
@@ -478,7 +478,7 @@ class Piano:
 						
 						'''
 							Draw freeplay mode 
-							stop music when exiting
+							Stop MIDI music playback when exiting
 							Piano and some button functionalities enabled after starting piano
 							Reset showing info tab
 						'''
@@ -495,7 +495,9 @@ class Piano:
 
 					elif keybind_toggle.collidepoint(mouse_pos):
 						
+						# Button functions after piano is drawn
 						if start == True:
+							# Toggle
 							self.keybind_toggle = (not self.keybind_toggle)
 							self.draw_white_keys()
 
@@ -511,7 +513,9 @@ class Piano:
 
 					elif note_toggle.collidepoint(mouse_pos):
 						
+						# Button functions after piano is drawn
 						if start == True:
+							# Toggle
 							self.note_toggle = (not self.note_toggle)
 							self.draw_white_keys()
 
@@ -611,6 +615,9 @@ class Piano:
 			song_title = filename.split("/")[-1].split(".")[0]
 			song_title = song_title.replace("-", " ").replace("_", " ")
 			self.song_title = song_title.title()
+
+			print("Valid file type!")
 		# Invalid file
 		else:
-			self.song_title = "Invalid song type!"
+			self.song_title = "Invalid file type!"
+			print("Invalid file type!")

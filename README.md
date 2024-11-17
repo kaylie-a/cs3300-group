@@ -11,7 +11,7 @@ Works through an executable file on desktop computers only.
 git clone https://github.com/kaylie-a/cs3300-group.git
 ```
 
-**Soundfonts**
+__**Soundfonts**__
 
 Download .sf2 file for piano audio: https://drive.google.com/file/d/1VZkoiVOonffpJWxZah-AdQkxaTFIzZ6q/view
 

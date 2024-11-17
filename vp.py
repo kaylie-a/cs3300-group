@@ -16,10 +16,10 @@ WHITE       = (255, 255, 255)
 WHITE_PRESS = (220, 220, 220)
 BLACK       = (0, 0, 0)
 BLACK_PRESS = (75, 75, 75)
-LIGHT_GRAY  = (100, 100, 100)
+LIGHT_GRAY  = (150, 150, 150)
 KEY_BORDER  = (200, 200, 200)
 # Test color
-GREEN       = (0,255,0)
+GREEN       = (0, 255, 0)
 
 mixer.init()
 pygame.init()
@@ -337,7 +337,7 @@ class Piano:
 	def draw_labels(self, i, black_key):
 		if self.keybind_toggle:
 			# Label white keys: 7 white keys per octave
-			label = pygame.font.Font(font,16).render(white_order[i], True, BLACK)
+			label = pygame.font.Font(font,16).render(white_order[i], True, WHITE)
 			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
 												(self.y_offset + self.white_key_height - 210)))
 			screen.blit(label, label_rect)
@@ -350,7 +350,7 @@ class Piano:
 				screen.blit(label, label_rect)
 
 		if self.note_toggle:
-			label = pygame.font.Font(font,16).render(white_notes_full[i], True, BLACK)
+			label = pygame.font.Font(font,16).render(white_notes_full[i], True, WHITE)
 			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
 												(self.y_offset + self.white_key_height + 15)))
 			screen.blit(label, label_rect)

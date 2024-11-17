@@ -75,7 +75,7 @@ def draw_notes(notes_pressed):
         screen.blit(text, (x - 10, y - NOTE_RADIUS - 20))
 
 if __name__ == "__main__":
-    midi_file = r'C:\GitHub\cs3300-group\songs\Fur-Elise-1.mid'             # This path will be different depending on computer directory and name
+    midi_file = r'C:\GitHub\cs3300-group\songs\Fur-Elise-1'             # This path will be different depending on computer directory and name
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Treble Clef MIDI Visualization")
     

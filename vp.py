@@ -109,6 +109,24 @@ class Button():
 		screen.blit(self.image, (self.rect.x, self.rect.y))
 
 
+class Callback():
+	def __init__(self):
+		self.name = ""
+		self.event_type = "down"
+
+	def name(self):
+		return self.name
+
+	def event_type(self):
+		return self.event_type
+	
+	def set_name(self, name):
+		self.name = name
+
+	def set_event_type(self, event_type):
+		self.event_type = event_type
+
+
 # pygame.Rect( x_pos, y_pos, rect_width, rect_height )	==>	anchor point is top left
 # Left side menu -------------------------------------------------------------------------------------------------------------
 image = pygame.image.load("icons/fpm-icon.png").convert_alpha()
@@ -174,7 +192,10 @@ image = pygame.image.load("icons/welcome-screen.png").convert_alpha()
 welcome_screen = Button((SCREEN_WIDTH / 2) - 400, (SCREEN_HEIGHT / 2) - 250, image, 0.65)
 
 
-# -----------------------------------------------------------------------------------------------------------------------------
+# Testing ---------------------------------------------------------------------------------------------------------------------
+image = pygame.image.load("icons/test-icon.png").convert_alpha()
+test_keys_button = pygame.Rect(10, SCREEN_HEIGHT - 160, 70, 70)
+test_keys_icon = Button(10, SCREEN_HEIGHT - 160, image, SCALE)
 
 
 class Piano:
@@ -236,6 +257,7 @@ class Piano:
 					fluidsynth.play_Note(n) 					# Play note
 					self.pressed_array[index] = True 			# The key is now pressed
 					self.press_key(index)						# Update GUI
+
 					print(f"{callback.name} => {n}")
 			# UP event
 			else: 
@@ -450,6 +472,10 @@ class Piano:
 			low_vol_icon.draw()
 			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))
 
+		# Testing buttons
+		pygame.draw.rect(screen, BLACK, test_keys_button)
+		test_keys_icon.draw()
+
 
 	# Run pygame and piano interface
 	def play_piano(self):
@@ -477,10 +503,10 @@ class Piano:
 					if freeplay_button.collidepoint(mouse_pos):
 						
 						'''
-							Draw freeplay mode 
-							Stop MIDI music playback when exiting
-							Piano and some button functionalities enabled after starting piano
-							Reset showing info tab
+						Draw freeplay mode 
+						Stop MIDI music playback when exiting
+						Piano and some button functionalities enabled after starting piano
+						Reset showing info tab
 						'''
 						self.menu_freeplay()
 						mixer.music.stop()
@@ -593,6 +619,17 @@ class Piano:
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
 
+
+
+					# Test buttons ------------------------------------------------------------------------------------------------------------
+
+					elif test_keys_button.collidepoint(mouse_pos):
+						mixer.music.stop()
+						start = True
+						self.info_tab_on = False
+						self.test_keys()
+
+
 			# Update the screen
 			self.draw_menu()
 			pygame.display.update()
@@ -621,3 +658,22 @@ class Piano:
 		else:
 			self.song_title = "Invalid file type!"
 			print("Invalid file type!")
+
+
+	# Tests each piano key for correct audio, press, and release visual
+	def test_keys(self):
+		callback = Callback()
+
+		self.menu_freeplay()
+
+		for i in order:
+			callback.name = i
+
+			callback.event_type = "down"
+			self.key(callback)
+
+			pygame.time.wait(100)
+
+			callback.event_type = "up"
+			self.key(callback)
+

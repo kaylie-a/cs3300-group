@@ -358,31 +358,33 @@ class Piano:
 	# Draw keybind and note labels on piano
 	def draw_labels(self, i, black_key):
 		if self.keybind_toggle:
-			# Label white keys: 7 white keys per octave
-			label = pygame.font.Font(font,16).render(white_order[i], True, WHITE)
-			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
-												(self.y_offset + self.white_key_height - 210)))
-			screen.blit(label, label_rect)
-
 			# Label black keys: 5 black keys per octave
 			if black_key == True:
-				label = pygame.font.Font(font,16).render(black_order[i], True, BLACK)
+				label = pygame.font.Font(font,16).render(black_order[i], True, BLACK, LIGHT_GRAY).convert_alpha()
 				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, 
 													(self.y_offset + self.black_key_height - 150)))
 				screen.blit(label, label_rect)
+			else: 
+			# Label white keys: 7 white keys per octave
+				label = pygame.font.Font(font,16).render(white_order[i], True, WHITE, LIGHT_GRAY).convert_alpha()
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
+												(self.y_offset + self.white_key_height - 210)))
+				screen.blit(label, label_rect)
 
 		if self.note_toggle:
-			label = pygame.font.Font(font,16).render(white_notes_full[i], True, WHITE)
-			label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
-												(self.y_offset + self.white_key_height + 15)))
-			screen.blit(label, label_rect)
-
 			# Label black keys: 5 black keys per octave
 			if black_key == True:
-				label = pygame.font.Font(font,16).render(black_notes_full[i], True, BLACK)
+				label = pygame.font.Font(font,16).render(black_notes_full[i], True, BLACK, LIGHT_GRAY).convert_alpha()
 				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width, 
 													(self.y_offset + self.black_key_height + 110)))
 				screen.blit(label, label_rect)
+			# Label white keys: 7 white keys per octave
+			else:
+				label = pygame.font.Font(font,16).render(white_notes_full[i], True, WHITE, LIGHT_GRAY).convert_alpha()
+				label_rect = label.get_rect(center=((self.x_offset + i * self.white_key_width) + self.white_key_width // 2, 
+												(self.y_offset + self.white_key_height + 15)))
+				screen.blit(label, label_rect)
+
 
 
 	# Initializes piano in Freeplay mode

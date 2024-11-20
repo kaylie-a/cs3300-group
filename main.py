@@ -1,7 +1,7 @@
 import time
 import os
 import configparser
-import vp
+import DigiPiano
 
 # Modify path to load fluid synth
 app_path = os.getcwd()+r'\fluidsynth'
@@ -18,7 +18,7 @@ soundfont_path = config['PIANO']['instrument']
 transposition = int(config['PIANO']['transposition'])
 volume = int(config['PIANO']['volume'])
 
-b1 = vp.Piano(soundfont_path, transpose=transposition)
+b1 = DigiPiano.Piano(soundfont_path, transpose=transposition)
 b1.volume = volume
 while True:
 	time.sleep(5)

@@ -9,6 +9,7 @@ Works through an executable file on desktop computers only.
 
 ```
 git clone https://github.com/kaylie-a/cs3300-group.git
+pip install -r requirements.txt
 ```
 
 <ins>**Soundfonts**</ins>

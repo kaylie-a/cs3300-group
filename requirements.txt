@@ -1,2 +1,4 @@
 keyboard==0.13.5
 mingus==0.6.1
+pygame==2.6.1
+tk==0.1.0

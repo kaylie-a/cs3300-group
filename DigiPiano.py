@@ -184,6 +184,11 @@ image = pygame.image.load("icons/volume-down-icon.png").convert_alpha()
 low_vol = pygame.Rect(SCREEN_WIDTH - 80, 330, 70, 70)
 low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
+#Background Image **need to figure out
+image = pygame.image.load("icons/background-icon.png").convert_alpha()
+background_button = pygame.Rect(SCREEN_WIDTH - 80, 100, 100, 100)
+background_icon = Button(SCREEN_WIDTH - 80, 100, image, SCALE)
+
 # Load Staff Image In - temp
 image = pygame.image.load("icons/staffIMG.jpg").convert_alpha()
 staff_image = Button(200, 0, image, SCREEN_WIDTH/1920 - 0.1)
@@ -463,6 +468,10 @@ class Piano:
 			pygame.draw.rect(screen, BLACK, pause_button)
 			pygame.draw.rect(screen, BLACK, inc_vol)
 			pygame.draw.rect(screen, BLACK, low_vol)
+
+			#Background button/icons **testing will clean up later
+			pygame.draw.rect(screen, BLACK, background_button)
+
 			
 			# Draw right side icons
 			file_icon.draw()
@@ -471,6 +480,9 @@ class Piano:
 			inc_vol_icon.draw()
 			low_vol_icon.draw()
 			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))
+
+			#Background button/icons **testing will clean up later
+			background_icon.draw()
 
 		# Testing buttons
 		pygame.draw.rect(screen, BLACK, test_keys_button)

@@ -186,8 +186,8 @@ low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
 #Background Image **need to figure out
 image = pygame.image.load("icons/background-icon.png").convert_alpha()
-background_button = pygame.Rect(SCREEN_WIDTH - 80, 100, 100, 100)
-background_icon = Button(SCREEN_WIDTH - 80, 100, image, SCALE)
+background_button = pygame.Rect(SCREEN_WIDTH - 80, 420, 100, 100)
+background_icon = Button(SCREEN_WIDTH - 80, 420, image, SCALE)
 
 # Load Staff Image In - temp
 image = pygame.image.load("icons/staffIMG.jpg").convert_alpha()

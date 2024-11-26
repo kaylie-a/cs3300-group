@@ -646,10 +646,23 @@ class Piano:
 					elif background_button.collidepoint(mouse_pos):
 
 						try:
-							filenameofbackgroundimage = filedialog.askopenfilename(initialdir="/images", title="Select file:", filetypes=[("JPG or PNG files", "*.jpg;*.png")])
-							screen.blit(filenameofbackgroundimage, (0, 0))
+							
+							filenameofbackgroundimage = filedialog.askopenfilename(
+								initialdir="/images",
+								title="Select file:",
+								filetypes=[("JPG or PNG files", "*.jpg;*.png")]
+							)
+
+							background_image = pygame.image.load(filenameofbackgroundimage)
+
+							background_image = pygame.transform.scale(background_image, (SCREEN_HEIGHT, SCREEN_WIDTH))
+
+							screen.blit(background_image)
+
+							pygame.display.flip()
+
 						except Exception as e:
-							print(e)
+							print(f"Error: {e}")
 
 			# Update the screen
 			self.draw_menu()

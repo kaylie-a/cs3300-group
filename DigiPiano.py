@@ -186,7 +186,7 @@ low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
 #Background Image **need to figure out
 image = pygame.image.load("icons/background-icon.png").convert_alpha()
-background_button = pygame.Rect(SCREEN_WIDTH - 80, 420, 100, 100)
+background_button = pygame.Rect(SCREEN_WIDTH - 80, 420, 70, 70)
 background_icon = Button(SCREEN_WIDTH - 80, 420, image, SCALE)
 
 # Load Staff Image In - temp
@@ -640,7 +640,16 @@ class Piano:
 						start = True
 						self.info_tab_on = False
 						self.test_keys()
+					
+					# Custom background image --------------------------------------------------------------- IN PROGRESS
 
+					elif background_button.collidepoint(mouse_pos):
+
+						try:
+							filenameofbackgroundimage = filedialog.askopenfilename(initialdir="/images", title="Select file:", filetypes=[("JPG or PNG files", "*.jpg;*.png")])
+							screen.blit(filenameofbackgroundimage, (0, 0))
+						except Exception as e:
+							print(e)
 
 			# Update the screen
 			self.draw_menu()

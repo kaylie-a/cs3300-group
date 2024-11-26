@@ -184,6 +184,11 @@ image = pygame.image.load("icons/volume-down-icon.png").convert_alpha()
 low_vol = pygame.Rect(SCREEN_WIDTH - 80, 330, 70, 70)
 low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
 
+#Background Image **need to figure out
+image = pygame.image.load("icons/background-icon.png").convert_alpha()
+background_button = pygame.Rect(SCREEN_WIDTH - 80, 420, 70, 70)
+background_icon = Button(SCREEN_WIDTH - 80, 420, image, SCALE)
+
 # Load Staff Image In - temp
 image = pygame.image.load("icons/staffIMG.jpg").convert_alpha()
 staff_image = Button(200, 0, image, SCREEN_WIDTH/1920 - 0.1)
@@ -465,6 +470,10 @@ class Piano:
 			pygame.draw.rect(screen, BLACK, pause_button)
 			pygame.draw.rect(screen, BLACK, inc_vol)
 			pygame.draw.rect(screen, BLACK, low_vol)
+
+			#Background button/icons **testing will clean up later
+			pygame.draw.rect(screen, BLACK, background_button)
+
 			
 			# Draw right side icons
 			file_icon.draw()
@@ -473,6 +482,9 @@ class Piano:
 			inc_vol_icon.draw()
 			low_vol_icon.draw()
 			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))
+
+			#Background button/icons **testing will clean up later
+			background_icon.draw()
 
 		# Testing buttons
 		pygame.draw.rect(screen, BLACK, test_keys_button)
@@ -621,8 +633,6 @@ class Piano:
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
 
-
-
 					# Test buttons ------------------------------------------------------------------------------------------------------------
 
 					elif test_keys_button.collidepoint(mouse_pos):
@@ -631,7 +641,36 @@ class Piano:
 						self.info_tab_on = False
 						self.test_keys()
 
+					# Custom background image --------------------------------------------------------------- IN PROGRESS
 
+					elif background_button.collidepoint(mouse_pos):
+
+						try:
+							
+							filenameofbackgroundimage = filedialog.askopenfilename(
+								initialdir="/images",
+								title="Select file:",
+								filetypes=[("JPG or PNG files", "*.jpg;*.png")]
+							)
+
+							background_image = pygame.image.load(filenameofbackgroundimage)
+
+							background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+							screen.blit(background_image, (0, 0))
+
+							pygame.display.flip()
+
+							self.draw_black_keys()
+							self.draw_white_keys()
+							self.draw_labels()
+							self.play_piano()
+							self.draw_menu
+
+
+						except Exception as e:
+							print(f"Error: {e}")
+					
 			# Update the screen
 			self.draw_menu()
 			pygame.display.update()

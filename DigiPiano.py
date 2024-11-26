@@ -631,8 +631,6 @@ class Piano:
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
 
-
-
 					# Test buttons ------------------------------------------------------------------------------------------------------------
 
 					elif test_keys_button.collidepoint(mouse_pos):
@@ -640,7 +638,7 @@ class Piano:
 						start = True
 						self.info_tab_on = False
 						self.test_keys()
-					
+
 					# Custom background image --------------------------------------------------------------- IN PROGRESS
 
 					elif background_button.collidepoint(mouse_pos):
@@ -655,15 +653,22 @@ class Piano:
 
 							background_image = pygame.image.load(filenameofbackgroundimage)
 
-							background_image = pygame.transform.scale(background_image, (SCREEN_HEIGHT, SCREEN_WIDTH))
+							background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-							screen.blit(background_image)
+							screen.blit(background_image, (0, 0))
 
 							pygame.display.flip()
 
+							self.draw_black_keys()
+							self.draw_white_keys()
+							self.draw_labels()
+							self.play_piano()
+							self.draw_menu
+
+
 						except Exception as e:
 							print(f"Error: {e}")
-
+					
 			# Update the screen
 			self.draw_menu()
 			pygame.display.update()

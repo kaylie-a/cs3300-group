@@ -280,10 +280,11 @@ class Piano:
 		if BLACKS[index % 12] == False:
 			i = W_POSITION.index(index)
 			total_keys[index] = pygame.draw.rect(screen, WHITE_PRESS, (self.x_offset + i * self.white_key_width + 1, 	# Printing doesn't overlap border
-															  		   self.y_offset, 
+															  		   self.y_offset + 2 * self.white_key_height // 3, 
 																	   self.white_key_width - 2, 
-																	   self.white_key_height))			
-			self.draw_black_keys()
+																	   self.white_key_height // 3))
+			
+			#self.draw_black_keys()
 		# Black key
 		else:
 			i = B_POSITION.index(index)
@@ -300,10 +301,10 @@ class Piano:
 		# White key
 		if BLACKS[index % 12] == False:
 			i = W_POSITION.index(index)
-			total_keys[index] = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width, 
-																 self.y_offset, 
-																 self.white_key_width, 
-																 self.white_key_height))
+			total_keys[index] = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width + 1, 
+																 self.y_offset + 2 * self.white_key_height // 3, 
+																 self.white_key_width - 2, 
+																 self.white_key_height // 3))
 		# Black key
 		else:
 			i = B_POSITION.index(index)
@@ -312,14 +313,17 @@ class Piano:
 																 self.black_key_width, 
 																 self.black_key_height))
 		
-		self.draw_white_keys()
-		pygame.display.update()
+		#TODO -- draw other keyboard on top with 0 transparency, on keypress set key to 255 transparency and then back to 0 on release
+		total_keys[index].update()
 
 
-	# Draw white keys on piano
-	def draw_white_keys(self):
+	# Draw keys on piano
+	def draw_keys(self):
     	# Draw white keys and border
+		skip_count = 0
+
 		for i in range(self.total_key_num):
+			#draw white keys
 			key = pygame.draw.rect(screen, WHITE, (self.x_offset + i * self.white_key_width, 
 										  		   self.y_offset, 
 												   self.white_key_width, 
@@ -329,15 +333,34 @@ class Piano:
 												  self.white_key_width, 
 												  self.white_key_height), 1)
 			total_keys.append(key)
+   
+			if self.keybind_toggle_on == 0 or self.note_toggle_on == 0:
+				self.draw_labels(i,False)
+    
+		for i in range(self.total_key_num):
+			#draw black keys
+			if skip_count not in [2, 6]:
+				pygame.draw.rect(screen, BLACK, (self.x_offset + i * self.white_key_width + self.white_key_width - self.black_key_width // 2, 
+									 			 self.y_offset, 
+												 self.black_key_width, 
+												 self.black_key_height))
+												 
 
-			if self.keybind_toggle_on == 0 or self.note_toggle_on == 0 :
-				self.draw_labels(i, False)
+			if self.keybind_toggle_on == 0 or self.note_toggle_on == 0:
+				self.draw_labels(i,True)
+    
+			skip_count += 1
+			
+    	    # Reset count on last key in octave for black keys
+			if skip_count == 7:
+				skip_count = 0
 
-		self.draw_black_keys()
+		#self.draw_black_keys()
 		pygame.display.flip()
 
 
 	# Separate function for drawing black keys - highlight on white keys doesn't cover black keys
+	'''
 	def draw_black_keys(self):
 		skip_count = 0
 
@@ -354,10 +377,11 @@ class Piano:
 				self.draw_labels(i, True)
 
 			skip_count += 1
-
+			
     	    # Reset count on last key in octave
 			if skip_count == 7:
 				skip_count = 0
+ 	'''
 			
 
 	# Draw keybind and note labels on piano
@@ -412,7 +436,7 @@ class Piano:
 		self.note_toggle_on = 0
 
 		screen.fill(LIGHT_GRAY)
-		self.draw_white_keys()
+		self.draw_keys()
 
 	
 	# Initializes piano in Learning mode
@@ -435,7 +459,7 @@ class Piano:
 		self.note_toggle_on = 0
 
 		screen.fill(LIGHT_GRAY)
-		self.draw_white_keys()
+		self.draw_keys()
 		
 
 	# Draws menu buttons
@@ -503,6 +527,7 @@ class Piano:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					run = False
+					print(total_keys)
 					pygame.quit()
 					exit()
 				
@@ -539,17 +564,28 @@ class Piano:
 						if start == True:
 							# Toggle
 							self.keybind_toggle = (not self.keybind_toggle)
-							self.draw_white_keys()
+							screen.fill(LIGHT_GRAY)
+
+							self.draw_keys()
+       
+							if self.keybind_toggle == True:
+								self.draw_labels
+        
+
+							'''
+							self.keybind_toggle = (not self.keybind_toggle)
+							self.draw_keys()
 
 							if self.keybind_toggle == True:
 								self.keybind_toggle_on += 1
 							else:
 								screen.fill(LIGHT_GRAY)
-								self.draw_white_keys()
+								self.draw_keys()
 								self.keybind_toggle_on = 0
 
 								if self.note_toggle == True:
-									self.draw_white_keys()
+									self.draw_keys()
+       						'''
 
 					elif note_toggle.collidepoint(mouse_pos):
 						
@@ -557,17 +593,17 @@ class Piano:
 						if start == True:
 							# Toggle
 							self.note_toggle = (not self.note_toggle)
-							self.draw_white_keys()
+							self.draw_keys()
 
 							if self.note_toggle == True:
 								self.note_toggle_on += 1
 							else:
 								screen.fill(LIGHT_GRAY)
-								self.draw_white_keys()
+								self.draw_keys()
 								self.note_toggle_on = 0
 
 								if self.keybind_toggle == True:
-									self.draw_white_keys()
+									self.draw_keys()
 
 					elif file_button.collidepoint(mouse_pos):
 
@@ -597,7 +633,7 @@ class Piano:
 							if start == False:
 								welcome_screen.draw()
 							else:
-								self.draw_white_keys()
+								self.draw_keys()
 
 	
 

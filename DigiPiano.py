@@ -42,6 +42,7 @@ total_keys = []
 clock = pygame.time.Clock()
 pygame.display.flip()
 
+
 # Names for note label printing
 white_notes_full = [ "C1", "D1", "E1", "F1", "G1", "A1", "B1",
 					 "C2", "D2", "E2", "F2", "G2", "A2", "B2",
@@ -109,6 +110,7 @@ class Button():
 		screen.blit(self.image, (self.rect.x, self.rect.y))
 
 
+# Class for piano key press or release
 class Callback():
 	def __init__(self):
 		self.name = ""
@@ -160,6 +162,11 @@ info_icon = Button(10, 490, image, SCALE)
 image = pygame.image.load("icons/info-tab.png").convert_alpha()
 info_tab = Button((SCREEN_WIDTH / 2) - 450, (SCREEN_HEIGHT / 2) - 500, image, 0.8)
 
+# Background Image **need to figure out
+image = pygame.image.load("icons/background-icon.png").convert_alpha()
+background_button = pygame.Rect(10, 570, 70, 70)
+background_icon = Button(10, 570, image, SCALE)
+
 
 # Right side menu ------------------------------------------------------------------------------------------------------------
 image = pygame.image.load("icons/file-icon.png").convert_alpha()
@@ -183,11 +190,6 @@ inc_vol_icon = Button(SCREEN_WIDTH - 80, 250, image, SCALE)
 image = pygame.image.load("icons/volume-down-icon.png").convert_alpha()
 low_vol = pygame.Rect(SCREEN_WIDTH - 80, 330, 70, 70)
 low_vol_icon = Button(SCREEN_WIDTH - 80, 330, image, SCALE)
-
-#Background Image **need to figure out
-image = pygame.image.load("icons/background-icon.png").convert_alpha()
-background_button = pygame.Rect(SCREEN_WIDTH - 80, 420, 70, 70)
-background_icon = Button(SCREEN_WIDTH - 80, 420, image, SCALE)
 
 # Load Staff Image In - temp
 image = pygame.image.load("icons/staffIMG.jpg").convert_alpha()
@@ -213,6 +215,7 @@ class Piano:
 		self.channel = 0
 		self.volume_value = 128
 		self.mode = False			# Freeplay Mode: False, Learning Mode: True
+		self.start = False
 
 		self.total_key_num = 0
 		self.x_offset      = 0
@@ -222,7 +225,8 @@ class Piano:
 		self.black_key_width  = 0
 		self.black_key_height = 0
 
-		self.filename = " "
+		self.background_image = "None"
+		self.midi_filename = " "
 		self.song_title = "Select MIDI file..."
 
 		self.keybind_toggle = False
@@ -415,7 +419,6 @@ class Piano:
 				screen.blit(label, label_rect)
 
 
-
 	# Initializes piano in Freeplay mode
 	def menu_freeplay(self):
 		self.total_key_num 	= 35
@@ -429,13 +432,17 @@ class Piano:
 		self.black_key_height = 125
 		self.pressed_array = [False]*len(self.order)
 		self.mode = False
+		self.start = True
+		self.info_tab_on = False
 
-		self.keybind_toggle = False		# Need to reset, otherwise breaks piano speed/visual
-		self.keybind_toggle_on = 0
-		self.note_toggle = False		
+		self.keybind_toggle_on = 0	
 		self.note_toggle_on = 0
 
-		screen.fill(LIGHT_GRAY)
+		if (self.background_image == "None"):
+			screen.fill(LIGHT_GRAY)
+		else:
+			screen.blit(self.background_image, (0, 0))
+
 		self.draw_keys()
 
 	
@@ -452,13 +459,17 @@ class Piano:
 		self.black_key_height = 125
 		self.pressed_array = [False]*len(self.order)
 		self.mode = True
+		self.start = True
+		self.info_tab_on = False
 
-		self.keybind_toggle = False		# Need to reset, otherwise breaks piano speed/visual
 		self.keybind_toggle_on = 0
-		self.note_toggle = False		
 		self.note_toggle_on = 0
 
-		screen.fill(LIGHT_GRAY)
+		if (self.background_image == "None"):
+			screen.fill(LIGHT_GRAY)
+		else:
+			screen.blit(self.background_image, (0, 0))
+
 		self.draw_keys()
 		
 
@@ -472,6 +483,7 @@ class Piano:
 		pygame.draw.rect(screen, BLACK, transpose_up)
 		pygame.draw.rect(screen, BLACK, transpose_down)
 		pygame.draw.rect(screen, BLACK, info_button)
+		pygame.draw.rect(screen, BLACK, background_button)
 
 		# Draw left side icons
 		keybind_icon.draw()
@@ -481,6 +493,12 @@ class Piano:
 		transpose_up_icon.draw()
 		transpose_down_icon.draw()
 		info_icon.draw()
+		background_icon.draw()
+
+		# Test button shows up after piano is drawn once
+		if self.start == True:
+			pygame.draw.rect(screen, BLACK, test_keys_button)
+			test_keys_icon.draw()
 
 		# Learning mode buttons
 		if self.mode == True:
@@ -494,10 +512,6 @@ class Piano:
 			pygame.draw.rect(screen, BLACK, pause_button)
 			pygame.draw.rect(screen, BLACK, inc_vol)
 			pygame.draw.rect(screen, BLACK, low_vol)
-
-			#Background button/icons **testing will clean up later
-			pygame.draw.rect(screen, BLACK, background_button)
-
 			
 			# Draw right side icons
 			file_icon.draw()
@@ -505,20 +519,12 @@ class Piano:
 			pause_icon.draw()
 			inc_vol_icon.draw()
 			low_vol_icon.draw()
-			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))
-
-			#Background button/icons **testing will clean up later
-			background_icon.draw()
-
-		# Testing buttons
-		pygame.draw.rect(screen, BLACK, test_keys_button)
-		test_keys_icon.draw()
+			screen.blit(pygame.font.SysFont("Calibri", 20).render(self.song_title, True, BLACK), (SCREEN_WIDTH - 360, 35))		
 
 
 	# Run pygame and piano interface
 	def play_piano(self):
 		run = True
-		start = False
 		song_volume = 2
 
 		welcome_screen.draw()
@@ -549,22 +555,22 @@ class Piano:
 						'''
 						self.menu_freeplay()
 						mixer.music.stop()
-						start = True
-						self.info_tab_on = False
 
 					if learning_button.collidepoint(mouse_pos):
 						
 						self.menu_learning()
-						start = True
-						self.info_tab_on = False
 
 					elif keybind_toggle.collidepoint(mouse_pos):
 						
 						# Button functions after piano is drawn
-						if start == True:
+						if self.start == True:
 							# Toggle
 							self.keybind_toggle = (not self.keybind_toggle)
-							screen.fill(LIGHT_GRAY)
+
+							if (self.background_image == "None"):
+								screen.fill(LIGHT_GRAY)
+							else:
+								screen.blit(self.background_image, (0, 0))
 
 							self.draw_keys()
        
@@ -590,7 +596,7 @@ class Piano:
 					elif note_toggle.collidepoint(mouse_pos):
 						
 						# Button functions after piano is drawn
-						if start == True:
+						if self.start == True:
 							# Toggle
 							self.note_toggle = (not self.note_toggle)
 							self.draw_keys()
@@ -598,7 +604,11 @@ class Piano:
 							if self.note_toggle == True:
 								self.note_toggle_on += 1
 							else:
-								screen.fill(LIGHT_GRAY)
+								if (self.background_image == "None"):
+									screen.fill(LIGHT_GRAY)
+								else:
+									screen.blit(self.background_image, (0, 0))
+
 								self.draw_keys()
 								self.note_toggle_on = 0
 
@@ -615,25 +625,59 @@ class Piano:
 							print(e)
 
 					elif transpose_up.collidepoint(mouse_pos):
-						if start == True:
+
+						if self.start == True:
 							self.semitone += 1
 
 					elif transpose_down.collidepoint(mouse_pos):
-						if start == True:
+
+						if self.start == True:
 							self.semitone -= 1
 
 					elif info_button.collidepoint(mouse_pos):
+
 						self.info_tab_on = (not self.info_tab_on)
 
 						if self.info_tab_on == True:
 							info_tab.draw()
 						else:
-							screen.fill(LIGHT_GRAY)
+							if (self.background_image == "None"):
+								screen.fill(LIGHT_GRAY)
+							else:
+								screen.blit(self.background_image, (0, 0))
 
-							if start == False:
+							if self.start == False:
 								welcome_screen.draw()
 							else:
 								self.draw_keys()
+
+					# Custom background image --------------------------------------------------------------- IN PROGRESS
+
+					elif background_button.collidepoint(mouse_pos):
+
+						try:
+							
+							background_filename = filedialog.askopenfilename(
+								initialdir="/images",
+								title="Select file:",
+								filetypes=[("JPG or PNG files", "*.jpg;*.png")]
+							)
+
+							self.background_image = pygame.image.load(background_filename)
+							self.background_image = pygame.transform.scale(self.background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+							screen.blit(self.background_image, (0, 0))
+							pygame.display.flip()
+
+							#self.draw_black_keys()
+							#self.draw_white_keys()
+							self.draw_keys()
+							self.draw_labels()
+							#self.play_piano()
+							#self.draw_menu
+
+						except Exception as e:
+							print(f"Error: {e}")
 
 	
 
@@ -642,7 +686,7 @@ class Piano:
 					elif play_button.collidepoint(mouse_pos):
 
 						try:
-							mixer.music.load(self.filename)
+							mixer.music.load(self.midi_filename)
 							mixer.music.set_volume(song_volume)
 							mixer.music.play()
 								
@@ -672,40 +716,11 @@ class Piano:
 					# Test buttons ------------------------------------------------------------------------------------------------------------
 
 					elif test_keys_button.collidepoint(mouse_pos):
+
 						mixer.music.stop()
-						start = True
-						self.info_tab_on = False
 						self.test_keys()
-
-					# Custom background image --------------------------------------------------------------- IN PROGRESS
-
-					elif background_button.collidepoint(mouse_pos):
-
-						try:
-							
-							filenameofbackgroundimage = filedialog.askopenfilename(
-								initialdir="/images",
-								title="Select file:",
-								filetypes=[("JPG or PNG files", "*.jpg;*.png")]
-							)
-
-							background_image = pygame.image.load(filenameofbackgroundimage)
-
-							background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
-							screen.blit(background_image, (0, 0))
-
-							pygame.display.flip()
-
-							self.draw_black_keys()
-							self.draw_white_keys()
-							self.draw_labels()
-							self.play_piano()
-							self.draw_menu
-
-
-						except Exception as e:
-							print(f"Error: {e}")
+						self.start = True
+						self.info_tab_on = False
 					
 			# Update the screen
 			self.draw_menu()
@@ -723,7 +738,7 @@ class Piano:
 		
 		# Valid MIDI file
 		if file_type == "mid":
-			self.filename = filename
+			self.midi_filename = filename
 
 			# Remove path, extension name, and capitalize
 			song_title = filename.split("/")[-1].split(".")[0]

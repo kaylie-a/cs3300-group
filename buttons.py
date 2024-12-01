@@ -81,7 +81,7 @@ image = pygame.image.load("icons/info-tab.png").convert_alpha()
 info_tab = Button((SCREEN_WIDTH / 2) - 450, (SCREEN_HEIGHT / 2) - 500, image, 0.8)
 
 # Background Image
-image = pygame.image.load("icons/background-icon.png").convert_alpha()
+image = pygame.image.load("icons/image-icon.png").convert_alpha()
 background_button = pygame.Rect(10, 570, 70, 70)
 background_icon = Button(10, 570, image, const.SCALE)
 
@@ -122,3 +122,6 @@ image = pygame.image.load("icons/test-icon.png").convert_alpha()
 test_keys_button = pygame.Rect(10, SCREEN_HEIGHT*0.95 - 160, 70, 70)
 test_keys_icon = Button(10, SCREEN_HEIGHT*0.95 - 160, image, const.SCALE)
 
+image = pygame.image.load("icons/DigiPiano-icon.png").convert_alpha()
+test_songs_button = pygame.Rect(10, SCREEN_HEIGHT*0.95 - 240, 70, 70)
+test_songs_icon = Button(10, SCREEN_HEIGHT*0.95 - 240, image, const.SCALE)

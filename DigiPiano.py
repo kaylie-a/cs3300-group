@@ -1,6 +1,7 @@
 import keyboard
 import time
 import pygame
+import os
 from pygame import mixer
 from mingus.midi import fluidsynth
 from mingus.containers.note import Note 
@@ -328,7 +329,10 @@ class Piano:
 		# Test button shows up after piano is drawn once
 		if self.start == True:
 			pygame.draw.rect(screen, const.BLACK, buttons.test_keys_button)
+			pygame.draw.rect(screen, const.BLACK, buttons.test_songs_button)
+
 			buttons.test_keys_icon.draw()
+			buttons.test_songs_icon.draw()
 
 		# Learning mode buttons
 		if self.mode == True:
@@ -396,7 +400,7 @@ class Piano:
 			self.key(callback)
 
 
-	# -------------------------------------------------------------------------------------------------------------
+	# -------------------------------------------------------------------------------------------------------------------------------------------
 
 
 	# Run pygame and piano interface
@@ -408,34 +412,41 @@ class Piano:
 
 		while run:
 			for event in pygame.event.get():
+				# Terminates when exit button pressed
 				if event.type == pygame.QUIT:
 					run = False
 					pygame.quit()
 					exit()
 				
-				# 3 states: MOUSEBUTTONDOWN, MOUSEBUTTONUP, or MOUSEMOTION
-				# event.button == 1: left mouse button
+				'''
+				Checks for when mouse is clicked at certain location
+				3 states: MOUSEBUTTONDOWN, MOUSEBUTTONUP, or MOUSEMOTION
+				event.button == 1: left mouse button
+				'''
 				if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 					
 					# Check which button is pressed
-					# Left side menu --------------------------------------------------------------------------------------------------------
 					mouse_pos = event.pos
 
-					if buttons.freeplay_button.collidepoint(mouse_pos):
-						
-						'''
-						Draw freeplay mode 
+					# Left side menu --------------------------------------------------------------------------------------------------------
+
+					'''
 						Stop MIDI music playback when exiting
 						Piano and some button functionalities enabled after starting piano
 						Reset showing info tab
-						'''
+					'''
+					# Freeplay mode 
+					if buttons.freeplay_button.collidepoint(mouse_pos):
+						
 						self.menu_freeplay()
 						mixer.music.stop()
 
-					if buttons.learning_button.collidepoint(mouse_pos):
+					# Learning Mode
+					elif buttons.learning_button.collidepoint(mouse_pos):
 						
 						self.menu_learning()
 
+					# Toggle keyboard bind labels
 					elif buttons.keybind_toggle.collidepoint(mouse_pos):
 						
 						# Button functions after piano is drawn
@@ -443,6 +454,7 @@ class Piano:
 							# Toggle
 							self.keybind_toggle = (not self.keybind_toggle)
 
+							# Fill background before drawing piano
 							if (self.background_image == "None"):
 								screen.fill(const.LIGHT_GRAY)
 							else:
@@ -452,66 +464,54 @@ class Piano:
        
 							if self.keybind_toggle == True:
 								self.draw_labels
-        
 
-							'''
-							self.keybind_toggle = (not self.keybind_toggle)
-							self.draw_keys()
-
-							if self.keybind_toggle == True:
-								self.keybind_toggle_on += 1
-							else:
-								screen.fill(LIGHT_GRAY)
-								self.draw_keys()
-								self.keybind_toggle_on = 0
-
-								if self.note_toggle == True:
-									self.draw_keys()
-       						'''
-
+					# Toggle piano note labels
 					elif buttons.note_toggle.collidepoint(mouse_pos):
-						
+
 						# Button functions after piano is drawn
 						if self.start == True:
 							# Toggle
 							self.note_toggle = (not self.note_toggle)
-							self.draw_keys()
 
-							if self.note_toggle == True:
-								self.note_toggle_on += 1
+							# Fill background before drawing piano
+							if (self.background_image == "None"):
+								screen.fill(const.LIGHT_GRAY)
 							else:
-								if (self.background_image == "None"):
-									screen.fill(const.LIGHT_GRAY)
-								else:
-									screen.blit(self.background_image, (0, 0))
+								screen.blit(self.background_image, (0, 0))
 
-								self.draw_keys()
-								self.note_toggle_on = 0
+							self.draw_keys()
+       
+							if self.keybind_toggle == True:
+								self.draw_labels
 
-								if self.keybind_toggle == True:
-									self.draw_keys()
-
+					# Opens files to import MIDI file
 					elif buttons.file_button.collidepoint(mouse_pos):
 
 						# Open file select
+						# Prevent crashing when file select is closed
 						try:
 							filename = filedialog.askopenfilename(initialdir="/songs", title="Select file:", filetypes=[("MIDI files", "*.mid")])
 							self.test_MIDI(filename)
+
 						except Exception as e:
 							print(e)
 
+					# Shifts keys up one half step
 					elif buttons.transpose_up.collidepoint(mouse_pos):
 
 						if self.start == True:
 							self.semitone += 1
 
+					# Shifts keys down one half step
 					elif buttons.transpose_down.collidepoint(mouse_pos):
 
 						if self.start == True:
 							self.semitone -= 1
 
+					# Shows and hides info screen
 					elif buttons.info_button.collidepoint(mouse_pos):
 
+						# Toggle
 						self.info_tab_on = (not self.info_tab_on)
 
 						if self.info_tab_on == True:
@@ -522,35 +522,36 @@ class Piano:
 							else:
 								screen.blit(self.background_image, (0, 0))
 
+							# Keep drawing welcome screen if piano has not been opened yet
 							if self.start == False:
 								buttons.welcome_screen.draw()
 							else:
 								self.draw_keys()
 
-					# Custom background image --------------------------------------------------------------- TODO
-
+					# Custom background image
 					elif buttons.background_button.collidepoint(mouse_pos):
 
 						try:
-							
+							# Image must be JPG or PNG type
 							background_filename = filedialog.askopenfilename(
 								initialdir="/images",
 								title="Select file:",
 								filetypes=[("JPG or PNG files", "*.jpg;*.png")]
 							)
 
+							# Load background image
 							self.background_image = pygame.image.load(background_filename)
 							self.background_image = pygame.transform.scale(self.background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 							screen.blit(self.background_image, (0, 0))
 							pygame.display.flip()
 
-							#self.draw_black_keys()
-							#self.draw_white_keys()
+							if self.start == False:
+								buttons.welcome_screen.draw()
+								
+							# Reprint over background
 							self.draw_keys()
 							self.draw_labels()
-							#self.play_piano()
-							#self.draw_menu
 
 						except Exception as e:
 							print(f"Error: {e}")
@@ -559,6 +560,7 @@ class Piano:
 
 					# Right side menu -------------------------------------------------------------------------------------------------------
 
+					# Plays MIDI audio
 					elif buttons.play_button.collidepoint(mouse_pos):
 
 						try:
@@ -570,33 +572,58 @@ class Piano:
 							print(e)
 							self.song_title = "No MIDI file found!"
 
+					# Stops MIDI audio
 					elif buttons.pause_button.collidepoint(mouse_pos):
 
 						try:
 							mixer.music.pause()
-							paused = True
 
 						except Exception as e:
 							print(e)
 
+					# Increases MIDI song volume
 					elif buttons.inc_vol.collidepoint(mouse_pos):
 
 						song_volume += 0.2
 						mixer.music.set_volume(song_volume)
 
+					# Decreases MIDI song volume
 					elif buttons.low_vol.collidepoint(mouse_pos):
 
 						song_volume -= 0.2
 						mixer.music.set_volume(song_volume)
 
+
+
 					# Test buttons ------------------------------------------------------------------------------------------------------------
 
+					# Runs through all the piano keys
+					# Tests audio playback on each key
 					elif buttons.test_keys_button.collidepoint(mouse_pos):
 
 						mixer.music.stop()
 						self.test_keys()
-						self.start = True
 						self.info_tab_on = False
+
+					# Runs a test song provided from GitHub
+					elif buttons.test_songs_button.collidepoint(mouse_pos):
+
+						# Put piano in learning mode for playing songs
+						self.menu_learning()
+
+						current_dir = os.getcwd()
+						song = current_dir+"/MIDI/songs/pachelbels-canon-arranged.mid"
+
+						self.test_MIDI(song)
+
+						try:
+							mixer.music.load(self.midi_filename)
+							mixer.music.set_volume(song_volume)
+							mixer.music.play()
+							
+						except Exception as e:
+							print(e)
+							self.song_title = "No MIDI file found!"
 					
 			# Update the screen
 			self.draw_menu()
